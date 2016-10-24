@@ -1,0 +1,18 @@
+{
+	"name": "debate",
+	"version": "0.0.0",
+	"description": "Database frontend for debate.",
+	"license": "UNLICENSED",
+	"main": "server.js",
+	"scripts": {
+		"start": "node server"
+	},
+	"author": "bjb568",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/bjb568/Debate"
+	},
+	"dependencies": {
+		"yield-yield": "^1.0.1"
+	}
+}
