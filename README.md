@@ -11,3 +11,5 @@ To install:
 To start the server:
 
 	$ node server
+
+Then go to http://127.0.0.1:3873 to see it.
