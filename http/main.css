@@ -23,6 +23,7 @@ main {
 header, nav div {
 	position: -webkit-sticky;
 	position: sticky;
+	z-index: 1;
 }
 header {
 	top: 0;
@@ -31,6 +32,7 @@ header {
 	font-size: 1.75vmin;
 	height: 4vmin;
 }
+body.editpage header { background: #adf }
 nav { margin-right: 1em }
 nav div {
 	max-height: calc(100vh - 4vmin);
@@ -101,3 +103,4 @@ h2 { font-size: 1.2em }
 h3 { font-size: 1.1em }
 q, blockquote { color: #008 }
 #editing { color: #888 }
+small { color: #666 }

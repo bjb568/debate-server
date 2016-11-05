@@ -86,6 +86,7 @@ http.createServer(o(function*(req, res) {
 		const data = getData(eid);
 		res.write(
 			replaceBody(req.url.pathname, (yield fs.readFile('./html/head.html', yield)) + (yield fs.readFile('./html/edit.html', yield)))
+			.replace('<body>', '<body class="editpage">')
 			.replaceAll('$title', 'Edit ' + eid.join(' '))
 			.replaceAll('$rawdata1', data[0])
 			.replaceAll('$rawdata2', data[1])
