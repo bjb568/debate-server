@@ -26,7 +26,8 @@ const mime = {
 };
 function formatData(sideName, sideData) {
 	return '<h1>' + sideName.html() + '</h1>' + sideData.data.map((item, i) => (
-		'<h' + sideData.dataMap[i].level + ' id="d' + i + '">' + sideData.dataMap[i].title + '</h' + sideData.dataMap[i].level + '>' + (item || '').markdown()
+		'<h' + sideData.dataMap[i].level + ' id="d' + i + '">' + sideData.dataMap[i].title + '</h' + sideData.dataMap[i].level + '>' +
+		'<div class="first">' + (item[0] || '').markdown() + '</div><div class="second">' + (item[1] || '').markdown() + '</div>'
 	)).join('');
 }
 function replaceBody(pathname, fdata) {
@@ -54,11 +55,11 @@ function getData(eid) {
 	if (eid[1] == 'map') return sData.dataMap.map(item => item.level + ' ' + item.title).join('\n');
 	return sData.data[eid[1]] || '';
 }
-function setData(eid, data) {
+function setData(eid, data1, data2) {
 	let sData = dataFile[eid[0]];
 	if (!sData) return;
-	if (eid[1] == 'map') sData.dataMap = data.split('\n').map(item => ({level: parseInt(item[0]), title: item.substr(2)}));
-	else sData.data[eid[1]] = data;
+	if (eid[1] == 'map') sData.dataMap = data1.split('\n').map(item => ({level: parseInt(item[0]), title: item.substr(2)}));
+	else sData.data[eid[1]] = [data1, data2];
 	fs.writeFile(config.dataPath, JSON.stringify(dataFile), (err) => {if (err) throw err;});
 }
 http.createServer(o(function*(req, res) {
@@ -75,17 +76,19 @@ http.createServer(o(function*(req, res) {
 		req.on('data', data => post += data);
 		req.on('end', () => {
 			post = querystring.parse(post);
-			setData(post.eid.split(' '), post.body);
+			setData(post.eid.split(' '), post.body1, post.body2);
 			res.writeHead(204);
 			res.end();
 		});
 	} else if (req.url.pathname.match(/(aff|neg)\/edit\/(\d+|map)/)) {
 		const eid = req.url.pathname.substr(1).replace('edit/', '').split('/');
 		res.writeHead(200, {'Content-Type': 'application/xhtml+xml; charset=utf-8'});
+		const data = getData(eid);
 		res.write(
 			replaceBody(req.url.pathname, (yield fs.readFile('./html/head.html', yield)) + (yield fs.readFile('./html/edit.html', yield)))
 			.replaceAll('$title', 'Edit ' + eid.join(' '))
-			.replaceAll('$rawdata', getData(eid))
+			.replaceAll('$rawdata1', data[0])
+			.replaceAll('$rawdata2', data[1])
 			.replaceAll('$editing', eid.join(' '))
 			.replaceAll('$htitle', eid[1] == 'map' ? '' : dataFile[eid[0]].dataMap[eid[1]].title)
 		);

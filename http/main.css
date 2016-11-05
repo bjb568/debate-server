@@ -52,10 +52,26 @@ nav span.l6 { margin-left: 4em }
 	0%, 30% { background: #f70 }
 }
 :target {
-	animation: target 1s;
 	margin-top: -4vmin;
 	padding-top: 4vmin;
+	position: relative;
 }
+:target::before {
+	content: '';
+	animation: target 1s;
+	position: absolute;
+	top: 4vmin; right: 0; bottom: 0; left: 0;
+	z-index: -1;
+}
+body.grey1 .first, body.grey2 .second { opacity: 0.3 }
+body.hide1 .first, body.hide2 .second { display: none }
+.first { border-left: 2px solid #f00 }
+.second { border-left: 2px solid #0f0 }
+.first, .second {
+	padding-left: 1em;
+	transition: opacity 0.2s;
+}
+.bmar { margin-bottom: 2em }
 .ta-cont, .ta-cont * { width: 100% }
 .ta-cont {
 	position: relative;
