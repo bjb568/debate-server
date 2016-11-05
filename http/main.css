@@ -20,6 +20,7 @@ main {
 	flex-basis: 0;
 	flex-grow: 1;
 }
+nav div > a:first-child { font-weight: bold }
 header, nav div {
 	position: -webkit-sticky;
 	position: sticky;

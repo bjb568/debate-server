@@ -42,7 +42,8 @@ function replaceBody(pathname, fdata) {
 				dataFile[side].dataMap.map((item, i) => (
 					' <span class="l' + item.level + '"><a href="/' + side + '/#d' + i + '">' + item.title + '</a> ' +
 					'<a href="/' + side + '/edit/' + i + '">E</a></span>'
-				)).join('')
+				)).join('') +
+				dataFile[side].data.reduce((p, item) => (p + item[0].split(/\s+/).length), 0) + ' words'
 			: '<a href="aff/">Aff</a> <a href="neg/">Neg</a>'
 		).replaceAll('$data', !fdata.includes('$data') ? '' : side ?
 			formatData(side, dataFile[side])
@@ -53,7 +54,7 @@ function getData(eid) {
 	let sData = dataFile[eid[0]];
 	if (!sData) return '';
 	if (eid[1] == 'map') return sData.dataMap.map(item => item.level + ' ' + item.title).join('\n');
-	return sData.data[eid[1]] || '';
+	return sData.data[eid[1]] || ['', ''];
 }
 function setData(eid, data1, data2) {
 	let sData = dataFile[eid[0]];
@@ -84,14 +85,16 @@ http.createServer(o(function*(req, res) {
 		const eid = req.url.pathname.substr(1).replace('edit/', '').split('/');
 		res.writeHead(200, {'Content-Type': 'application/xhtml+xml; charset=utf-8'});
 		const data = getData(eid);
+		const map = eid[1] == 'map';
 		res.write(
 			replaceBody(req.url.pathname, (yield fs.readFile('./html/head.html', yield)) + (yield fs.readFile('./html/edit.html', yield)))
 			.replace('<body>', '<body class="editpage">')
 			.replaceAll('$title', 'Edit ' + eid.join(' '))
-			.replaceAll('$rawdata1', data[0])
+			.replaceAll('$rawdata1', map ? data : data[0])
 			.replaceAll('$rawdata2', data[1])
+			.replaceAll('class="second"', map ? 'class="second" hidden=""' : 'class="second"')
 			.replaceAll('$editing', eid.join(' '))
-			.replaceAll('$htitle', eid[1] == 'map' ? '' : dataFile[eid[0]].dataMap[eid[1]].title)
+			.replaceAll('$htitle', map ? '' : dataFile[eid[0]].dataMap[eid[1]].title)
 		);
 		res.end(yield fs.readFile('./html/foot.html', yield));
 	} else if (req.url.pathname.indexOf('/aff/') == 0 || req.url.pathname.indexOf('/neg/') == 0) {
