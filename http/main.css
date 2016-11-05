@@ -7,7 +7,6 @@ html {
 	font: 130% sans-serif;
 	line-height: 1.5;
 }
-html, body { height: 100% }
 body {
 	margin: 0;
 	-webkit-text-size-adjust: none;
@@ -15,30 +14,48 @@ body {
 	display: flex;
 	flex-direction: column;
 }
+body > div { display: flex }
 header, main { padding: 0.5em }
-main { overflow: auto }
-header {
+main {
+	flex-basis: 0;
+	flex-grow: 1;
+}
+header, nav div {
 	position: -webkit-sticky;
 	position: sticky;
+}
+header {
 	top: 0;
-	background: #eee;
+	background: #ddd;
 	flex-shrink: 0;
-	display: flex;
+	font-size: 1.75vmin;
+	height: 4vmin;
 }
-nav {
-	background: #ffe;
+nav { margin-right: 1em }
+nav div {
+	max-height: calc(100vh - 4vmin);
+	overflow-y: auto;
+	top: 4vmin;
 	padding: 0.5em 1em;
-	margin-right: 1em;
+	background: #ffe;
 }
+nav div > * { display: block }
 nav a {
-	display: block;
 	white-space: nowrap;
 	color: #00f;
 }
+nav span.l3 { margin-left: 1em }
+nav span.l4 { margin-left: 2em }
+nav span.l5 { margin-left: 3em }
+nav span.l6 { margin-left: 4em }
 @keyframes target {
 	0%, 30% { background: #f70 }
 }
-:target { animation: target 1s }
+:target {
+	animation: target 1s;
+	margin-top: -4vmin;
+	padding-top: 4vmin;
+}
 .ta-cont, .ta-cont * { width: 100% }
 .ta-cont {
 	position: relative;
@@ -63,5 +80,8 @@ nav a {
 .ta-cont textarea {
 	bottom: 0;
 }
-h1, h2 { font-size: 1.3em }
+h1 { font-size: 1.3em }
+h2 { font-size: 1.2em }
+h3 { font-size: 1.1em }
 q, blockquote { color: #008 }
+#editing { color: #888 }

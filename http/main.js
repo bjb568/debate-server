@@ -18,7 +18,7 @@ addEventListener('input', function() {
 		document.activeElement.nextElementSibling.textContent = document.activeElement.value + '\n';
 		document.activeElement.parentNode.style.height = document.activeElement.nextElementSibling.offsetHeight + 'px';
 		clearTimeout(timeout);
-		timeout = setTimeout(sendUpdate, 1000, document.activeElement);
+		timeout = setTimeout(sendUpdate, 100, document.activeElement);
 	}
 });
 addEventListener('keypress', function(e) {
