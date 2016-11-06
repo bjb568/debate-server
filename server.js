@@ -9,6 +9,7 @@ const o = require('yield-yield');
 const config = require('./config.js');
 const dataFile = JSON.parse(fs.readFileSync(config.dataPath));
 dataFile.resolution = dataFile.resolution || '';
+dataFile.notes = dataFile.notes || '';
 dataFile.aff = dataFile.aff || {};
 dataFile.aff.dataMap = dataFile.aff.dataMap || [];
 dataFile.aff.data = dataFile.aff.data || [];
@@ -44,10 +45,10 @@ function replaceBody(pathname, fdata) {
 					'<a href="/' + side + '/edit/' + i + '">E</a></span>'
 				)).join('') +
 				dataFile[side].data.reduce((p, item) => (p + item[0].split(/\s+/).length), 0) + ' words'
-			: '<a href="aff/">Aff</a> <a href="neg/">Neg</a>'
+			: '<span><a href="aff/">Aff</a> <a href="neg/">Neg</a></span>'
 		).replaceAll('$data', !fdata.includes('$data') ? '' : side ?
 			formatData(side, dataFile[side])
-			: 'test'
+			: '<h1>Notes</h1><div class="ta-cont"><textarea id="notes" autofocus="">' + dataFile.notes + '</textarea><pre></pre></div>'
 		);
 }
 function getData(eid) {
@@ -57,10 +58,14 @@ function getData(eid) {
 	return sData.data[eid[1]] || ['', ''];
 }
 function setData(eid, data1, data2) {
-	let sData = dataFile[eid[0]];
-	if (!sData) return;
-	if (eid[1] == 'map') sData.dataMap = data1.split('\n').map(item => ({level: parseInt(item[0]), title: item.substr(2)}));
-	else sData.data[eid[1]] = [data1, data2];
+	console.log(eid);
+	if (eid[0] == 'notes') dataFile.notes = data1;
+	else {
+		let sData = dataFile[eid[0]];
+		if (!sData) return;
+		if (eid[1] == 'map') sData.dataMap = data1.split('\n').map(item => ({level: parseInt(item[0]), title: item.substr(2)}));
+		else sData.data[eid[1]] = [data1, data2];
+	}
 	fs.writeFile(config.dataPath, JSON.stringify(dataFile), (err) => {if (err) throw err;});
 }
 http.createServer(o(function*(req, res) {

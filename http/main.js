@@ -11,11 +11,14 @@ function request(uri, cb, params) {
 	};
 	return i;
 }
+let editing = document.getElementById('editing');
 function sendUpdate() {
 	request('/api/edit/', res => console.log(res),
-		'eid=' + encodeURIComponent(document.getElementById('editing').firstChild.nodeValue) +
-		'&body1=' + encodeURIComponent(document.getElementById('ta1').value) +
-		'&body2=' + encodeURIComponent(document.getElementById('ta2').value)
+		editing ?
+			'eid=' + encodeURIComponent(editing.firstChild.nodeValue) +
+			'&body1=' + encodeURIComponent(document.getElementById('ta1').value) +
+			'&body2=' + encodeURIComponent(document.getElementById('ta2').value)
+		: 'eid=notes&body1=' + encodeURIComponent(document.getElementById('notes').value)
 	);
 }
 addEventListener('click', function(e) {
