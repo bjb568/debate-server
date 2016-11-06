@@ -99,9 +99,12 @@ body.hide1 .first, body.hide2 .second { display: none }
 .ta-cont textarea {
 	bottom: 0;
 }
-h1 { font-size: 1.3em }
+h1 { font-size: 1.4em }
 h2 { font-size: 1.2em }
-h3 { font-size: 1.1em }
+h3 { font-size: 1em }
+h4 { font-size: 0.9em }
+h5 { font-size: 0.8em }
+h6 { font-size: 0.7em }
 q, blockquote { color: #008 }
 #editing { color: #888 }
 small { color: #666 }
