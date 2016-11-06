@@ -11,7 +11,7 @@ function request(uri, cb, params) {
 	};
 	return i;
 }
-let editing = document.getElementById('editing');
+let editing;
 function sendUpdate() {
 	request('/api/edit/', res => console.log(res),
 		editing ?
@@ -46,4 +46,5 @@ addEventListener('DOMContentLoaded', function() {
 		ta.nextElementSibling.textContent = ta.value + '\n';
 		ta.parentNode.style.height = ta.nextElementSibling.offsetHeight + 'px';
 	});
+	editing = document.getElementById('editing');
 });
