@@ -44,7 +44,8 @@ function replaceBody(pathname, fdata) {
 					' <span class="l' + item.level + '"><a href="/' + side + '/#d' + i + '">' + item.title + '</a> ' +
 					'<a href="/' + side + '/edit/' + i + '">E</a></span>'
 				)).join('') +
-				dataFile[side].data.reduce((p, item) => (p + item[0].split(/\s+/).length), 0) + ' words'
+				dataFile[side].data.reduce((p, item) => (p + item[0].split(/\s+/).length), 0) + '/' +
+				dataFile[side].data.reduce((p, item) => (p + item[1].split(/\s+/).length), 0) + ' words'
 			: '<span><a href="aff/">Aff</a> <a href="neg/">Neg</a></span>'
 		).replaceAll('$data', !fdata.includes('$data') ? '' : side ?
 			formatData(side, dataFile[side])
