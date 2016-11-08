@@ -6,8 +6,10 @@ const url = require('url');
 const querystring = require('querystring');
 const fs = require('fs');
 const o = require('yield-yield');
+const readYaml = require('read-yaml');
+const writeYaml = require('write-yaml');
 const config = require('./config.js');
-const dataFile = JSON.parse(fs.readFileSync(config.dataPath));
+const dataFile = readYaml.sync(config.dataPath);
 dataFile.resolution = dataFile.resolution || '';
 dataFile.notes = dataFile.notes || '';
 dataFile.aff = dataFile.aff || {};
@@ -67,7 +69,7 @@ function setData(eid, data1, data2) {
 		if (eid[1] == 'map') sData.dataMap = data1.split('\n').map(item => ({level: parseInt(item[0]), title: item.substr(2)}));
 		else sData.data[eid[1]] = [data1, data2];
 	}
-	fs.writeFile(config.dataPath, JSON.stringify(dataFile, null, '\t'), (err) => {if (err) throw err;});
+	writeYaml(config.dataPath, dataFile, (err) => {throw err;});
 }
 http.createServer(o(function*(req, res) {
 	req.url = url.parse(req.url, true);

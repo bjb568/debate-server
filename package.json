@@ -10,9 +10,11 @@
 	"author": "bjb568",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/bjb568/Debate"
+		"url": "https://github.com/bjb568/debate-server"
 	},
 	"dependencies": {
-		"yield-yield": "^1.0.1"
+		"yield-yield": "^1.0.1",
+		"read-yaml": "^1.0.0",
+		"write-yaml": "^0.2.2"
 	}
 }
