@@ -69,7 +69,7 @@ function setData(eid, data1, data2) {
 		if (eid[1] == 'map') sData.dataMap = data1.split('\n').map(item => ({level: parseInt(item[0]), title: item.substr(2)}));
 		else sData.data[eid[1]] = [data1, data2];
 	}
-	writeYaml(config.dataPath, dataFile, (err) => {throw err;});
+	writeYaml(config.dataPath, dataFile, (err) => {if (err) throw err;});
 }
 http.createServer(o(function*(req, res) {
 	req.url = url.parse(req.url, true);
