@@ -85,7 +85,7 @@ http.createServer(o(function*(req, res) {
 		req.on('data', data => post += data);
 		req.on('end', () => {
 			post = querystring.parse(post);
-			setData(post.eid.split(' '), post.body1, post.body2);
+			setData(post.eid.split(' '), (post.body1 || '').sanitize(), (post.body2 || '').sanitize());
 			res.writeHead(204);
 			res.end();
 		});

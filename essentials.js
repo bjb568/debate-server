@@ -250,3 +250,6 @@ function markdown(input) {
 String.prototype.markdown = function() {
 	return markdown(this);
 };
+String.prototype.sanitize = function() {
+	return this.replaceAll(['“', '”', '‘', '’'], ['"', '"', '\'', '\'']);
+};
