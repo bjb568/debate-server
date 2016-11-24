@@ -106,14 +106,13 @@ h4 { font-size: 0.9em }
 h5 { font-size: 0.8em }
 h6 { font-size: 0.7em }
 q, blockquote { color: #008 }
-q::before, blockquote > :first-child::before { content: '(quote) ' }
-q::after, blockquote > :last-child::after { content: ' (end quote)' }
-q::before, blockquote > :first-child::before, q::after, blockquote > :last-child::after {
+div > p > q::before, blockquote > :first-child::before { content: '(quote) ' }
+div > p > q::after, blockquote > :last-child::after { content: ' (end quote)' }
+div > p > q::before, blockquote > :first-child::before, div > p > q::after, blockquote > :last-child::after {
 	font-size: 0.7em;
 	font-style: italic;
 	line-height: 1;
 	color: #888;
 }
-blockquote q::before, blockquote q::after { content: '' }
 #editing { color: #888 }
 small { color: #666 }
