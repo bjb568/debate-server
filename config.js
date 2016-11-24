@@ -1,5 +1,5 @@
 'use strict';
 module.exports = {
 	port: 3873,
-	dataPath: '../debate-data/iot.yaml'
+	dataPath: '../debate-data/qualifiedimmunity.yaml'
 };
