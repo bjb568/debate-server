@@ -30,7 +30,7 @@ const mime = {
 function formatData(sideName, sideData) {
 	return '<h1>' + sideName.html() + '</h1>' + sideData.data.map((item, i) => (
 		'<h' + sideData.dataMap[i].level + ' id="d' + i + '">' + sideData.dataMap[i].title + '</h' + sideData.dataMap[i].level + '>' +
-		'<div class="first">' + (item[0] || '').markdown() + '</div><div class="second">' + (item[1] || '').markdown() + '</div>'
+		'<div class="first">' + (item[0] || '').markdown() + '</div><div class="second">' + (item[1] || '').markdown() + '</div><div class="third">' + (item[2] || '').markdown() + '</div>'
 	)).join('');
 }
 function replaceBody(pathname, fdata) {
@@ -47,7 +47,8 @@ function replaceBody(pathname, fdata) {
 					'<a href="/' + side + '/edit/' + i + '">E</a></span>'
 				)).join('') +
 				dataFile[side].data.reduce((p, item) => (p + item[0].split(/\s+/).length), 0) + '/' +
-				dataFile[side].data.reduce((p, item) => (p + item[1].split(/\s+/).length), 0) + ' words'
+				dataFile[side].data.reduce((p, item) => (p + item[1].split(/\s+/).length), 0) + '/' +
+				dataFile[side].data.reduce((p, item) => (p + item[2].split(/\s+/).length), 0) + ' words'
 			: '<span><a href="aff/">Aff</a> <a href="neg/">Neg</a></span>'
 		).replaceAll('$data', !fdata.includes('$data') ? '' : side ?
 			formatData(side, dataFile[side])
@@ -58,16 +59,16 @@ function getData(eid) {
 	let sData = dataFile[eid[0]];
 	if (!sData) return '';
 	if (eid[1] == 'map') return sData.dataMap.map(item => item.level + ' ' + item.title).join('\n');
-	return sData.data[eid[1]] || ['', ''];
+	return sData.data[eid[1]] || ['', '', ''];
 }
-function setData(eid, data1, data2) {
+function setData(eid, data1, data2, data3) {
 	console.log(eid);
 	if (eid[0] == 'notes') dataFile.notes = data1;
 	else {
 		let sData = dataFile[eid[0]];
 		if (!sData) return;
 		if (eid[1] == 'map') sData.dataMap = data1.split('\n').map(item => ({level: parseInt(item[0]), title: item.substr(2)}));
-		else sData.data[eid[1]] = [data1, data2];
+		else sData.data[eid[1]] = [data1, data2, data3];
 	}
 	writeYaml(config.dataPath, dataFile, (err) => {if (err) throw err;});
 }
@@ -85,7 +86,7 @@ http.createServer(o(function*(req, res) {
 		req.on('data', data => post += data);
 		req.on('end', () => {
 			post = querystring.parse(post);
-			setData(post.eid.split(' '), (post.body1 || '').sanitize(), (post.body2 || '').sanitize());
+			setData(post.eid.split(' '), (post.body1 || '').sanitize(), (post.body2 || '').sanitize(), (post.body3 || '').sanitize());
 			res.writeHead(204);
 			res.end();
 		});
@@ -100,7 +101,9 @@ http.createServer(o(function*(req, res) {
 			.replaceAll('$title', 'Edit ' + eid.join(' '))
 			.replaceAll('$rawdata1', map ? data : data[0])
 			.replaceAll('$rawdata2', data[1])
-			.replaceAll('class="second"', map ? 'class="second" hidden=""' : 'class="second"')
+			.replaceAll('$rawdata3', data[2])
+			.replaceAll('class="second bmar"', map ? 'class="second bmar" hidden=""' : 'class="second bmar"')
+			.replaceAll('class="third"', map ? 'class="third" hidden=""' : 'class="third"')
 			.replaceAll('$editing', eid.join(' '))
 			.replaceAll('$htitle', map ? '' : dataFile[eid[0]].dataMap[eid[1]].title)
 		);

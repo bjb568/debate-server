@@ -66,11 +66,12 @@ nav span.l6 { margin-left: 4em }
 	top: 4vmin; right: 0; bottom: 0; left: 0;
 	z-index: -1;
 }
-body.grey1 .first, body.grey2 .second { opacity: 0.3 }
-body.hide1 .first, body.hide2 .second { display: none }
+body.grey1 .first, body.grey2 .second, body.grey3 .third { opacity: 0.3 }
+body.hide1 .first, body.hide2 .second, body.hide3 .third { display: none }
 .first { border-left: 2px solid #f00 }
-.second { border-left: 2px solid #0f0 }
-.first, .second {
+.second { border-left: 2px solid #f90 }
+.third { border-left: 2px solid #0c0 }
+.first, .second, .third {
 	padding-left: 1em;
 	transition: opacity 0.2s;
 }

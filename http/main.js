@@ -17,15 +17,18 @@ function sendUpdate() {
 		editing ?
 			'eid=' + encodeURIComponent(editing.firstChild.nodeValue) +
 			'&body1=' + encodeURIComponent(document.getElementById('ta1').value) +
-			'&body2=' + encodeURIComponent(document.getElementById('ta2').value)
+			'&body2=' + encodeURIComponent(document.getElementById('ta2').value) +
+			'&body3=' + encodeURIComponent(document.getElementById('ta3').value)
 		: 'eid=notes&body1=' + encodeURIComponent(document.getElementById('notes').value)
 	);
 }
 addEventListener('click', function(e) {
 	document.body.classList.toggle('grey1', document.getElementById('grey1').checked);
 	document.body.classList.toggle('grey2', document.getElementById('grey2').checked);
+	document.body.classList.toggle('grey3', document.getElementById('grey3').checked);
 	document.body.classList.toggle('hide1', document.getElementById('hide1').checked);
 	document.body.classList.toggle('hide2', document.getElementById('hide2').checked);
+	document.body.classList.toggle('hide3', document.getElementById('hide3').checked);
 });
 addEventListener('input', function() {
 	if (document.activeElement.parentNode.classList.contains('ta-cont')) {
