@@ -46,6 +46,7 @@ nav div > * { display: block }
 nav a {
 	white-space: nowrap;
 	color: #00f;
+	text-decoration: none;
 }
 nav span.l3 { margin-left: 1em }
 nav span.l4 { margin-left: 2em }
@@ -116,4 +117,4 @@ div > p > q::before, blockquote > :first-child::before, div > p > q::after, bloc
 	color: #888;
 }
 #editing { color: #888 }
-small { color: #666 }
+small, .time { color: #666 }

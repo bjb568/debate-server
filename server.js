@@ -29,8 +29,10 @@ const mime = {
 };
 function formatData(sideName, sideData) {
 	return '<h1>' + sideName.html() + '</h1>' + sideData.data.map((item, i) => (
-		'<h' + sideData.dataMap[i].level + ' id="d' + i + '">' + sideData.dataMap[i].title + '</h' + sideData.dataMap[i].level + '>' +
-		'<div class="first">' + (item[0] || '').markdown() + '</div><div class="second">' + (item[1] || '').markdown() + '</div><div class="third">' + (item[2] || '').markdown() + '</div>'
+		sideData.dataMap[i] ?
+			'<h' + sideData.dataMap[i].level + ' id="d' + i + '">' + sideData.dataMap[i].title.html().replace(/(\d+)$/, '<span class="time">$1</span>') + '</h' + sideData.dataMap[i].level + '>' +
+			'<div class="first">' + (item[0] || '').markdown() + '</div><div class="second">' + (item[1] || '').markdown() + '</div><div class="third">' + (item[2] || '').markdown() + '</div>'
+		: ''
 	)).join('');
 }
 function replaceBody(pathname, fdata) {
@@ -43,8 +45,8 @@ function replaceBody(pathname, fdata) {
 				(editing ? '<a href="../">End Edit</a>' : '<a href="/">Home</a>') +
 				'<span><a href="/' + side + '/edit/map">Map</a> <a href="#">#</a></span>' +
 				dataFile[side].dataMap.map((item, i) => (
-					' <span class="l' + item.level + '"><a href="/' + side + '/#d' + i + '">' + item.title + '</a> ' +
-					'<a href="/' + side + '/edit/' + i + '">E</a></span>'
+					' <span class="l' + item.level + '"><a href="/' + side + '/#d' + i + '">' + item.title.html().replace(/(\d+)$/, '<span class="time">$1</span>') + '</a> ' +
+					'<a class="edit-link" href="/' + side + '/edit/' + i + '">E</a></span>'
 				)).join('') +
 				dataFile[side].data.reduce((p, item) => (p + item[0].split(/\s+/).length), 0) + '/' +
 				dataFile[side].data.reduce((p, item) => (p + item[1].split(/\s+/).length), 0) + '/' +
@@ -99,13 +101,13 @@ http.createServer(o(function*(req, res) {
 			replaceBody(req.url.pathname, (yield fs.readFile('./html/head.html', yield)) + (yield fs.readFile('./html/edit.html', yield)))
 			.replace('<body>', '<body class="editpage">')
 			.replaceAll('$title', 'Edit ' + eid.join(' '))
-			.replaceAll('$rawdata1', map ? data : data[0])
-			.replaceAll('$rawdata2', data[1])
-			.replaceAll('$rawdata3', data[2])
+			.replaceAll('$rawdata1', map ? data.html() : data[0].html())
+			.replaceAll('$rawdata2', (data[1] || '').html())
+			.replaceAll('$rawdata3', (data[2] || '').html())
 			.replaceAll('class="second bmar"', map ? 'class="second bmar" hidden=""' : 'class="second bmar"')
 			.replaceAll('class="third"', map ? 'class="third" hidden=""' : 'class="third"')
 			.replaceAll('$editing', eid.join(' '))
-			.replaceAll('$htitle', map ? '' : dataFile[eid[0]].dataMap[eid[1]].title)
+			.replaceAll('$htitle', map ? '' : dataFile[eid[0]].dataMap[eid[1]].title.html().replace(/(\d+)$/, '<span class="time">$1</span>'))
 		);
 		res.end(yield fs.readFile('./html/foot.html', yield));
 	} else if (req.url.pathname.indexOf('/aff/') == 0 || req.url.pathname.indexOf('/neg/') == 0) {
