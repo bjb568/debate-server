@@ -251,5 +251,5 @@ String.prototype.markdown = function() {
 	return markdown(this);
 };
 String.prototype.sanitize = function() {
-	return this.replaceAll(['“', '”', '‘', '’'], ['"', '"', '\'', '\'']);
+	return this.replaceAll(['“', '”', '‘', '’', 'U.S.'], ['"', '"', '\'', '\'', 'US']);
 };
