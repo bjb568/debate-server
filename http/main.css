@@ -20,8 +20,8 @@ main {
 	flex-basis: 0;
 	flex-grow: 1;
 }
-nav div > a:first-child { font-weight: bold }
-header, nav div {
+#jumps > span:first-child a { font-weight: bold }
+header, nav > div {
 	position: -webkit-sticky;
 	position: sticky;
 	z-index: 1;
@@ -34,48 +34,63 @@ header {
 	height: 4vmin;
 }
 body.editpage header { background: #adf }
-nav { margin-right: 1em }
-nav div {
+body.speech1 .leaf:not(.speech1) { display: none }
+nav { margin-right: 0.5em }
+nav > div {
 	max-height: calc(100vh - 4vmin);
 	overflow-y: auto;
 	top: 4vmin;
-	padding: 0.5em 1em;
-	background: #ffe;
 }
-nav div > * { display: block }
+nav > div > div { padding: 0.5em 1em }
+#jumps { background: #ffd }
+#cards { background: #dfd }
+#other { background: #def }
+#ctrls { background: #fed }
+#jumps div {
+	margin-left: 2px;
+	border-left: 1px solid #aaa;
+	padding-left: 9px;
+}
+nav > div div > * { display: block }
 nav a {
 	white-space: nowrap;
 	color: #00f;
 	text-decoration: none;
 }
-nav span.l3 { margin-left: 1em }
-nav span.l4 { margin-left: 2em }
-nav span.l5 { margin-left: 3em }
-nav span.l6 { margin-left: 4em }
+.right { float: right }
+main > div > div > div .cont { margin-left: 1em }
 @keyframes target {
 	0%, 30% { background: #f70 }
 }
+main div { padding: 1px 0 }
 :target {
-	margin-top: -4vmin;
-	padding-top: 4vmin;
-	position: relative;
+	margin-top: -4vh;
+	padding-top: calc(4vh + 1px);
 }
-:target::before {
+:target > div { position: relative }
+:target > div::before {
 	content: '';
 	animation: target 1s;
 	position: absolute;
-	top: 4vmin; right: 0; bottom: 0; left: 0;
+	top: -0.5em; right: -0.5em; bottom: -0.5em; left: -0.5em;
 	z-index: -1;
 }
-body.grey1 .first, body.grey2 .second, body.grey3 .third { opacity: 0.3 }
-body.hide1 .first, body.hide2 .second, body.hide3 .third { display: none }
-.first { border-left: 2px solid #f00 }
-.second { border-left: 2px solid #f90 }
-.third { border-left: 2px solid #0c0 }
-.first, .second, .third {
-	padding-left: 1em;
-	transition: opacity 0.2s;
+article h1::first-letter { text-transform: capitalize }
+article h1 a {
+	text-decoration: none;
+	color: #444;
 }
+.leaf {
+	margin: 0.5em 0;
+	padding: 1em;
+	background: #f8f8f8;
+}
+.card-h { background: #dfd }
+.navcard a { color: #040 }
+#cards .navcard a { color: #000 }
+.leaf > :first-child { margin-top: 0 }
+.leaf > :last-child { margin-bottom: 0 }
+.speech1 { border-left: 1px solid #f00 }
 .bmar { margin-bottom: 2em }
 .ta-cont, .ta-cont * { width: 100% }
 .ta-cont {
@@ -101,13 +116,21 @@ body.hide1 .first, body.hide2 .second, body.hide3 .third { display: none }
 .ta-cont textarea {
 	bottom: 0;
 }
-h1 { font-size: 1.4em }
+h1 {
+	font-size: 1.4em;
+	margin: 0;
+}
 h2 { font-size: 1.2em }
 h3 { font-size: 1em }
 h4 { font-size: 0.9em }
 h5 { font-size: 0.8em }
 h6 { font-size: 0.7em }
 q, blockquote { color: #008 }
+blockquote {
+	margin-left: 2px;
+	border-left: 2px solid #008;
+	padding-left: 1em;
+}
 div > p > q::before, blockquote > :first-child::before { content: '(quote) ' }
 div > p > q::after, blockquote > :last-child::after { content: ' (end quote)' }
 div > p > q::before, blockquote > :first-child::before, div > p > q::after, blockquote > :last-child::after {
@@ -118,3 +141,4 @@ div > p > q::before, blockquote > :first-child::before, div > p > q::after, bloc
 }
 #editing { color: #888 }
 small, .time { color: #666 }
+.inline { display: inline }
