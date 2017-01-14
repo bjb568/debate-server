@@ -20,6 +20,11 @@ const mime = {
 function hash(p) {
 	return crypto.createHash('md5').update(p).digest('base64').substr(0, 10);
 }
+const nameSort = (a, b) => {
+	if (a.name < b.name) return -1;
+	if (a.name > b.name) return 1;
+	return 0;
+};
 const read = o(function*(p, prop, cb) {
 	cb(null, (yield fs.readFile(p, yield))[prop]());
 });
@@ -31,7 +36,7 @@ const readDir = o(function*(p, prefix, cb) {
 	const extname = path.extname(p);
 	let ret = {p, extname, name: path.basename(p, extname), hash: hash(p), cards: []};
 	ret.jump = '<span class="' + (ret.name.length == 1 ? 'inline' : '') + (extname ? ' nav' + extname.substr(1) : '') + '"><a href="' + prefix + '#' + ret.hash + '">' + ret.name + '</a></span> ';
-	if (extname == '.card') ret.cards.push(ret.jump);
+	if (extname == '.card') ret.cards.push({jump: ret.jump, name: ret.name});
 	if (stat && stat.isDirectory()) {
 		ret.isDir = true;
 		const list = yield fs.readdir(p, yield);
@@ -48,11 +53,7 @@ const readDir = o(function*(p, prefix, cb) {
 				if (err && pending > 0) return (pending = 0) || cb(err);
 				ret.sub.push(ps);
 				if (!--pending) {
-					ret.sub.sort(((a, b) => {
-						if (a.name < b.name) return -1;
-						if (a.name > b.name) return 1;
-						return 0;
-					}));
+					ret.sub.sort(nameSort);
 					(indexFile || '').toString().split('\n').forEach((itemName, i) => {
 						itemName = itemName.replace(/^- |\d+$/g, '');
 						let j = -1;
@@ -72,7 +73,7 @@ const readDir = o(function*(p, prefix, cb) {
 					ret.sub.forEach((subp) => ret.jump += subp.jump);
 					ret.jump += '</div>';
 					ret.sub.forEach((subp) => (ret.cards = ret.cards.concat(subp.cards)));
-					ret.cards.sort();
+					ret.cards = ret.cards.sort(nameSort);
 					return cb(null, ret);
 				}
 			});
@@ -83,7 +84,7 @@ const writeHead = o(function*(res, options, cb) {
 	res.writeHead(200, {'Content-Type': 'application/xhtml+xml; charset=utf-8'});
 	const resolution = yield read(path.join(config.dataPath, 'resolution'), 'imd', yield);
 	const jumps = options.jumps || '';
-	const cards = options.cards || options.tree.cards.join(' ');
+	const cards = options.cards || options.tree.cards.map(c => c.jump).join(' ');
 	const other = options.other || options.tree.other || '';
 	res.write(
 		(yield fs.readFile('./html/head.html', yield)).toString()
