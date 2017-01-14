@@ -5,19 +5,9 @@ const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
 const fs = require('fs');
+const crypto = require('crypto');
 const o = require('yield-yield');
-const readYaml = require('read-yaml');
-const writeYaml = require('write-yaml');
 const config = require('./config.js');
-const dataFile = readYaml.sync(config.dataPath);
-dataFile.resolution = dataFile.resolution || '';
-dataFile.notes = dataFile.notes || '';
-dataFile.aff = dataFile.aff || {};
-dataFile.aff.dataMap = dataFile.aff.dataMap || [];
-dataFile.aff.data = dataFile.aff.data || [];
-dataFile.neg = dataFile.neg || {};
-dataFile.neg.dataMap = dataFile.neg.dataMap || [];
-dataFile.neg.data = dataFile.neg.data || [];
 const mime = {
 	'.html': 'text/html',
 	'.css': 'text/css',
@@ -27,92 +17,128 @@ const mime = {
 	'.mp3': 'audio/mpeg',
 	'.ico': 'image/x-icon'
 };
-function formatData(sideName, sideData) {
-	return '<h1>' + sideName.html() + '</h1>' + sideData.data.map((item, i) => (
-		sideData.dataMap[i] ?
-			'<h' + sideData.dataMap[i].level + ' id="d' + i + '">' + sideData.dataMap[i].title.html().replace(/(\d+)$/, '<span class="time">$1</span>') + '</h' + sideData.dataMap[i].level + '>' +
-			'<div class="first">' + (item[0] || '').markdown() + '</div><div class="second">' + (item[1] || '').markdown() + '</div><div class="third">' + (item[2] || '').markdown() + '</div>'
-		: ''
-	)).join('');
+function hash(p) {
+	return crypto.createHash('md5').update(p).digest('base64').substr(0, 10);
 }
-function replaceBody(pathname, fdata) {
-	const side = pathname.split('/')[1];
-	const editing = pathname.split('/')[2] == 'edit';
-	return fdata
-		.toString()
-		.replaceAll('$resolution', dataFile.resolution)
-		.replace('$nav', side ?
-				(editing ? '<a href="../">End Edit</a>' : '<a href="/">Home</a>') +
-				'<span><a href="/' + side + '/edit/map">Map</a> <a href="#">#</a></span>' +
-				dataFile[side].dataMap.map((item, i) => (
-					' <span class="l' + item.level + '"><a href="/' + side + '/#d' + i + '">' + item.title.html().replace(/(\d+)$/, '<span class="time">$1</span>') + '</a> ' +
-					'<a class="edit-link" href="/' + side + '/edit/' + i + '">E</a></span>'
-				)).join('') +
-				dataFile[side].data.reduce((p, item) => (p + (item[0] || '').split(/\s+/).length), 0) + '/' +
-				dataFile[side].data.reduce((p, item) => (p + (item[1] || '').split(/\s+/).length), 0) + '/' +
-				dataFile[side].data.reduce((p, item) => (p + (item[2] || '').split(/\s+/).length), 0) + ' words'
-			: '<span><a href="aff/">Aff</a> <a href="neg/">Neg</a></span>'
-		).replaceAll('$data', !fdata.includes('$data') ? '' : side ?
-			formatData(side, dataFile[side])
-			: '<h1>Notes</h1><div class="ta-cont"><textarea id="notes" autofocus="">' + dataFile.notes + '</textarea><pre></pre></div>'
-		);
-}
-function getData(eid) {
-	let sData = dataFile[eid[0]];
-	if (!sData) return '';
-	if (eid[1] == 'map') return sData.dataMap.map(item => item.level + ' ' + item.title).join('\n');
-	return sData.data[eid[1]] || ['', '', ''];
-}
-function setData(eid, data1, data2, data3) {
-	console.log(eid);
-	if (eid[0] == 'notes') dataFile.notes = data1;
-	else {
-		let sData = dataFile[eid[0]];
-		if (!sData) return;
-		if (eid[1] == 'map') sData.dataMap = data1.split('\n').map(item => ({level: parseInt(item[0]), title: item.substr(2)}));
-		else sData.data[eid[1]] = [data1, data2, data3];
+const read = o(function*(p, prop, cb) {
+	cb(null, (yield fs.readFile(p, yield))[prop]());
+});
+const readDir = o(function*(p, prefix, cb) {
+	let stat;
+	try {
+		stat = yield fs.stat(p, yield);
+	} catch (e) {}
+	const extname = path.extname(p);
+	let ret = {p, extname, name: path.basename(p, extname), hash: hash(p), cards: []};
+	ret.jump = '<span class="' + (ret.name.length == 1 ? 'inline' : '') + (extname ? ' nav' + extname.substr(1) : '') + '"><a href="' + prefix + '#' + ret.hash + '">' + ret.name + '</a></span> ';
+	if (extname == '.card') ret.cards.push(ret.jump);
+	if (stat && stat.isDirectory()) {
+		ret.isDir = true;
+		const list = yield fs.readdir(p, yield);
+		ret.sub = [];
+		let pending = list.length;
+		if (!pending) return cb(null, ret);
+		let indexFile;
+		try {
+			indexFile = yield fs.readFile(path.join(p, 'index'), yield);
+		} catch (e) {}
+		list.forEach(function(subp) {
+			if (['index', 'resolution', 'card.h'].includes(subp) || subp[0] == '.') return --pending;
+			readDir(path.join(p, subp), prefix + (['aff', 'neg'].includes(subp) ? '/' + subp + '/' : ''), (err, ps) => {
+				if (err && pending > 0) return (pending = 0) || cb(err);
+				ret.sub.push(ps);
+				if (!--pending) {
+					ret.sub.sort(((a, b) => {
+						if (a.name < b.name) return -1;
+						if (a.name > b.name) return 1;
+						return 0;
+					}));
+					(indexFile || '').toString().split('\n').forEach((itemName, i) => {
+						itemName = itemName.replace(/^- |\d+$/g, '');
+						let j = -1;
+						for (let k = 0; k < ret.sub.length; k++) {
+							if (ret.sub[k].name == itemName) {
+								j = k;
+								break;
+							}
+						}
+						if (j != -1) {
+							const subI = ret.sub[i];
+							ret.sub[i] = ret.sub[j];
+							ret.sub[j] = subI;
+						}
+					});
+					ret.jump += '<div>';
+					ret.sub.forEach((subp) => ret.jump += subp.jump);
+					ret.jump += '</div>';
+					ret.sub.forEach((subp) => (ret.cards = ret.cards.concat(subp.cards)));
+					ret.cards.sort();
+					return cb(null, ret);
+				}
+			});
+		});
+	} else return cb(null, ret);
+});
+const writeHead = o(function*(res, options, cb) {
+	res.writeHead(200, {'Content-Type': 'application/xhtml+xml; charset=utf-8'});
+	const resolution = yield read(path.join(config.dataPath, 'resolution'), 'imd', yield);
+	const jumps = options.jumps || '';
+	const cards = options.cards || options.tree.cards.join(' ');
+	const other = options.other || options.tree.other || '';
+	res.write(
+		(yield fs.readFile('./html/head.html', yield)).toString()
+		.replaceAll(
+			['$title', '$resolution', '$jumps', '$cards', '$other'],
+			['Debate', resolution, jumps, cards, other]
+		)
+	);
+	cb();
+});
+const writeFoot = o(function*(res, cb) {
+	res.end(yield fs.readFile('./html/foot.html', yield));
+	cb();
+});
+const writeCase = o(function*(res, p, cb) {
+	res.write('<div id="' + hash(p) + '" class="cont"><div class="leaf' + (path.basename(p) == 'a' ? ' speech1' : '') + '">' + (yield read(p, 'md', yield)) + '</div></div>');
+	cb();
+});
+const writeCardH = o(function*(res, p, cb) {
+	res.write('<article id="' + hash(p) + '" class="cont card"><div>');
+	const card = (yield fs.readFile(path.join(p, 'card.h'), yield)).toString().split('\n', 2);
+	res.write('<div class="leaf card-h"><h1><a href="' + card[0].html() + '">' + path.basename(p, '.card') + '</a></h1>' + (card[1] || '').md() + '</div>');
+	cb();
+});
+const writeCaseR = o(function*(res, tree, cb) {
+	if (!tree.isDir) yield writeCase(res, tree.p, yield);
+	else if (path.extname(tree.p) == '.card') yield writeCardH(res, tree.p, yield);
+	else res.write('<div id="' + hash(tree.p) + '" class="cont">');
+	if (tree.sub) {
+		for (let i = 0; i < tree.sub.length; i++) {
+			yield writeCaseR(res, tree.sub[i], yield);
+		}
 	}
-	writeYaml(config.dataPath, dataFile, (err) => {if (err) throw err;});
-}
+	if (tree.isDir) res.write('</div>');
+	if (path.extname(tree.p) == '.card') res.write('</article>');
+	cb();
+});
 http.createServer(o(function*(req, res) {
 	req.url = url.parse(req.url, true);
 	console.log(req.method, req.url.pathname);
-	if (req.url.pathname == '/' || req.url.pathname == '/aff/' || req.url.pathname == '/neg/') {
-		res.writeHead(200, {'Content-Type': 'application/xhtml+xml; charset=utf-8'});
-		res.write((yield fs.readFile('./html/head.html', yield)).toString().replaceAll('$title', req.url.pathname.replaceAll('/', '') || 'Debate'));
-		res.write(replaceBody(req.url.pathname, yield fs.readFile('./html/home.html', yield)));
-		res.end(yield fs.readFile('./html/foot.html', yield));
-	} else if (req.url.pathname == '/api/edit/') {
-		if (req.method != 'POST') return res.writeHead(405) || res.end('Error: Method not allowed. Use POST.');
-		let post = '';
-		req.on('data', data => post += data);
-		req.on('end', () => {
-			post = querystring.parse(post);
-			setData(post.eid.split(' '), (post.body1 || '').sanitize(), (post.body2 || '').sanitize(), (post.body3 || '').sanitize());
-			res.writeHead(204);
-			res.end();
-		});
-	} else if (req.url.pathname.match(/(aff|neg)\/edit\/(\d+|map)/)) {
-		const eid = req.url.pathname.substr(1).replace('edit/', '').split('/');
-		res.writeHead(200, {'Content-Type': 'application/xhtml+xml; charset=utf-8'});
-		const data = getData(eid);
-		const map = eid[1] == 'map';
-		res.write(
-			replaceBody(req.url.pathname, (yield fs.readFile('./html/head.html', yield)) + (yield fs.readFile('./html/edit.html', yield)))
-			.replace('<body>', '<body class="editpage">')
-			.replaceAll('$title', 'Edit ' + eid.join(' '))
-			.replaceAll('$rawdata1', map ? data.html() : data[0].html())
-			.replaceAll('$rawdata2', (data[1] || '').html())
-			.replaceAll('$rawdata3', (data[2] || '').html())
-			.replaceAll('class="second bmar"', map ? 'class="second bmar" hidden=""' : 'class="second bmar"')
-			.replaceAll('class="third"', map ? 'class="third" hidden=""' : 'class="third"')
-			.replaceAll('$editing', eid.join(' '))
-			.replaceAll('$htitle', map ? '' : dataFile[eid[0]].dataMap[eid[1]].title.html().replace(/(\d+)$/, '<span class="time">$1</span>'))
-		);
-		res.end(yield fs.readFile('./html/foot.html', yield));
-	} else if (req.url.pathname.indexOf('/aff/') == 0 || req.url.pathname.indexOf('/neg/') == 0) {
-		res.writeHead(303, {Location: req.url.pathname.substr(0, 5) + '#d' + req.url.pathname.substr(5).replaceAll('/', '')});
-		res.end();
+	const tree = yield readDir(path.join(config.dataPath, req.url.pathname), '', yield);
+	if (req.url.pathname == '/') {
+		yield writeHead(res, {
+			jumps: '<span><a href="/aff/">Aff</a> <a class="right" href="/neg/">Neg</a></span>' + tree.jump,
+			tree
+		}, yield);
+		yield writeCase(res, path.join(config.dataPath, 'notes'), yield);
+		yield writeFoot(res, yield);
+	} else if (req.url.pathname == '/aff/' || req.url.pathname == '/neg/') {
+		yield writeHead(res, {
+			jumps: '<span><a href="/">Home</a></span><h1>' + req.url.pathname.replaceAll('/', '') + '</h1>' + tree.jump,
+			tree
+		}, yield);
+		yield writeCaseR(res, tree, yield);
+		yield writeFoot(res, yield);
 	} else {
 		let stats;
 		try {

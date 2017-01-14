@@ -23,12 +23,7 @@ function sendUpdate() {
 	);
 }
 addEventListener('click', function(e) {
-	document.body.classList.toggle('grey1', document.getElementById('grey1').checked);
-	document.body.classList.toggle('grey2', document.getElementById('grey2').checked);
-	document.body.classList.toggle('grey3', document.getElementById('grey3').checked);
-	document.body.classList.toggle('hide1', document.getElementById('hide1').checked);
-	document.body.classList.toggle('hide2', document.getElementById('hide2').checked);
-	document.body.classList.toggle('hide3', document.getElementById('hide3').checked);
+	document.body.classList.toggle('speech1', document.getElementById('speech1').checked);
 });
 addEventListener('input', function() {
 	if (document.activeElement.parentNode.classList.contains('ta-cont')) {
