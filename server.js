@@ -25,13 +25,44 @@ const nameSort = (a, b) => {
 	if (a.name > b.name) return 1;
 	return 0;
 };
+const createDir = o(function*(p, cb) {
+	try {
+		yield fs.stat(path.dirname(p), yield);
+		yield fs.mkdir(p, yield);
+	} catch (e) {
+		yield createDir(path.dirname(p), yield);
+	}
+	try {
+		yield fs.stat(p, yield);
+	} catch (e) {
+		yield fs.mkdir(p, yield);
+	}
+	cb(null);
+});
+const createFile = o(function*(p, cb) {
+	try {
+		yield fs.stat(path.dirname(p), yield);
+	} catch (e) {
+		yield createDir(path.dirname(p), yield);
+	}
+	try {
+		yield fs.stat(p, yield);
+	} catch (e) {
+		console.log('Creating file ', p);
+		yield fs.writeFile(p, '', yield);
+	}
+	cb(null);
+});
 const read = o(function*(p, prop, cb) {
+	p = path.join(config.dataPath, p);
+	yield createFile(p, yield);
 	cb(null, (yield fs.readFile(p, yield))[prop]());
 });
 const readDir = o(function*(p, prefix, cb) {
+	const fullP = path.join(config.dataPath, p);
 	let stat;
 	try {
-		stat = yield fs.stat(p, yield);
+		stat = yield fs.stat(fullP, yield);
 	} catch (e) {}
 	const extname = path.extname(p);
 	let ret = {p, extname, name: path.basename(p, extname), hash: hash(p), cards: []};
@@ -39,13 +70,13 @@ const readDir = o(function*(p, prefix, cb) {
 	if (extname == '.card') ret.cards.push({jump: ret.jump, name: ret.name});
 	if (stat && stat.isDirectory()) {
 		ret.isDir = true;
-		const list = yield fs.readdir(p, yield);
+		const list = yield fs.readdir(fullP, yield);
 		ret.sub = [];
 		let pending = list.length;
 		if (!pending) return cb(null, ret);
 		let indexFile;
 		try {
-			indexFile = yield fs.readFile(path.join(p, 'index'), yield);
+			indexFile = yield fs.readFile(path.join(fullP, 'index'), yield);
 		} catch (e) {}
 		list.forEach(function(subp) {
 			if (['index', 'resolution', 'card.h'].includes(subp) || subp[0] == '.') return --pending;
@@ -82,15 +113,15 @@ const readDir = o(function*(p, prefix, cb) {
 });
 const writeHead = o(function*(res, options, cb) {
 	res.writeHead(200, {'Content-Type': 'application/xhtml+xml; charset=utf-8'});
-	const resolution = yield read(path.join(config.dataPath, 'resolution'), 'imd', yield);
+	const resolution = yield read('resolution', 'imd', yield);
 	const jumps = options.jumps || '';
 	const cards = options.cards || options.tree.cards.map(c => c.jump).join(' ');
 	const other = options.other || options.tree.other || '';
 	res.write(
 		(yield fs.readFile('./html/head.html', yield)).toString()
 		.replaceAll(
-			['$title', '$resolution', '$jumps', '$cards', '$other'],
-			['Debate', resolution, jumps, cards, other]
+			['$title', '$resolution', '$jumps', '$cards', '$other', '<body>'],
+			['Debate', resolution, jumps, cards, other, options.editpage ? '<body class="editpage">' : '<body>']
 		)
 	);
 	cb();
@@ -100,13 +131,20 @@ const writeFoot = o(function*(res, cb) {
 	cb();
 });
 const writeCase = o(function*(res, p, cb) {
-	res.write('<div id="' + hash(p) + '" class="cont"><div class="leaf' + (path.basename(p) == 'a' ? ' speech1' : '') + '">' + (yield read(p, 'md', yield)) + '</div></div>');
+	res.write(`<div id="${hash(p)}" class="cont">
+		<a href="/edit/${encodeURIComponent(p)}" class="right">Edit</a>
+		<div class="leaf${path.basename(p) == 'a' ? ' speech1' : ''}">${yield read(p, 'md', yield)}</div>
+	</div>`);
 	cb();
 });
 const writeCardH = o(function*(res, p, cb) {
-	res.write('<article id="' + hash(p) + '" class="cont card"><div>');
-	const card = (yield fs.readFile(path.join(p, 'card.h'), yield)).toString().split('\n', 2);
-	res.write('<div class="leaf card-h"><h1><a href="' + card[0].html() + '">' + path.basename(p, '.card') + '</a></h1>' + (card[1] || '').md() + '</div>');
+	const card = (yield fs.readFile(path.join(config.dataPath, p, 'card.h'), yield)).toString().split('\n', 2);
+	res.write(`
+		<article id="${hash(p)}" class="cont card">
+		<div>
+			<a href="/edit/${encodeURIComponent(path.join(p, 'card.h'))}" class="right">Edit</a>
+			<div class="leaf card-h"><h1><a href="${card[0].html()}">${path.basename(p, '.card')}</a></h1>${(card[1] || '').md()}</div>`
+	);
 	cb();
 });
 const writeCaseR = o(function*(res, tree, cb) {
@@ -125,13 +163,15 @@ const writeCaseR = o(function*(res, tree, cb) {
 http.createServer(o(function*(req, res) {
 	req.url = url.parse(req.url, true);
 	console.log(req.method, req.url.pathname);
-	const tree = yield readDir(path.join(config.dataPath, req.url.pathname), '', yield);
+	let navLoc = req.url.pathname;
+	if (!['/aff/', '/neg/'].includes(navLoc)) navLoc = '/';
+	const tree = yield readDir(navLoc, '', yield);
 	if (req.url.pathname == '/') {
 		yield writeHead(res, {
 			jumps: '<span><a href="/aff/">Aff</a> <a class="right" href="/neg/">Neg</a></span>' + tree.jump,
 			tree
 		}, yield);
-		yield writeCase(res, path.join(config.dataPath, 'notes'), yield);
+		yield writeCase(res, 'notes', yield);
 		yield writeFoot(res, yield);
 	} else if (req.url.pathname == '/aff/' || req.url.pathname == '/neg/') {
 		yield writeHead(res, {
@@ -139,6 +179,28 @@ http.createServer(o(function*(req, res) {
 			tree
 		}, yield);
 		yield writeCaseR(res, tree, yield);
+		yield writeFoot(res, yield);
+	} else if (req.url.pathname == '/api/edit/') {
+		if (req.method != 'POST') return res.writeHead(405) || res.end('Error: Method not allowed. Use POST.');
+		let post = '';
+		req.on('data', data => post += data);
+		yield req.on('end', yield);
+		const p = path.join(config.dataPath, decodeURIComponent((url.parse(req.headers.referer || '').pathname || '').substr(6)));
+		yield fs.writeFile(p, post, yield);
+		res.writeHead(204);
+		res.end();
+	} else if (req.url.pathname.substr(0, 6) == '/edit/') {
+		yield writeHead(res, {
+			jumps: '<span><a href="/">Home</a><br/><a href="/aff/">Aff</a> <a class="right" href="/neg/">Neg</a></span>' + tree.jump,
+			tree,
+			editpage: true
+		}, yield);
+		const p = decodeURIComponent(req.url.pathname.substr(6));
+		const data = yield read(p, 'html', yield);
+		res.write(`<h1><a href="/#${hash(p)}">${p} <del class="right">Edit</del></a></h1><div class="ta-cont">
+			<textarea id="ta" autofocus="">${data}</textarea>
+			<pre></pre>
+		</div>`);
 		yield writeFoot(res, yield);
 	} else {
 		let stats;

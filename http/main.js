@@ -13,14 +13,7 @@ function request(uri, cb, params) {
 }
 let editing;
 function sendUpdate() {
-	request('/api/edit/', res => console.log(res),
-		editing ?
-			'eid=' + encodeURIComponent(editing.firstChild.nodeValue) +
-			'&body1=' + encodeURIComponent(document.getElementById('ta1').value) +
-			'&body2=' + encodeURIComponent(document.getElementById('ta2').value) +
-			'&body3=' + encodeURIComponent(document.getElementById('ta3').value)
-		: 'eid=notes&body1=' + encodeURIComponent(document.getElementById('notes').value)
-	);
+	request('/api/edit/', res => console.log(res), document.getElementById('ta').value);
 }
 addEventListener('click', function(e) {
 	document.body.classList.toggle('speech1', document.getElementById('speech1').checked);
@@ -35,7 +28,7 @@ addEventListener('input', function() {
 });
 addEventListener('keypress', function(e) {
 	if (e.keyCode == 115 && e.metaKey) {
-		if (document.getElementsByTagName('textarea')[0]) sendUpdate();
+		if (document.getElementById('ta')) sendUpdate();
 		e.preventDefault();
 	}
 });
@@ -54,9 +47,9 @@ addEventListener('DOMContentLoaded', function() {
 function textareaHandler(e, s) {
 	if (this.noHandle) return delete this.nHandle;
 	if (!this.hist) this.hist = [{
-		body: '',
-		start: 0,
-		end: 0
+		body: this.value,
+		start: this.selectionStart,
+		end: this.selectionEnd
 	}];
 	if (!this.hIndex) this.hIndex = 0;
 	if (!s && e.which == 9 && !e.ctrlKey && !e.altKey && !e.metaKey) {

@@ -58,25 +58,31 @@ nav a {
 	text-decoration: none;
 }
 .right { float: right }
+:not(span) > .right { color: #444 }
+.right:not(del) { text-decoration: none }
+h1 .right {
+	font-size: 1rem;
+	font-weight: normal;
+}
 main > div > div > div .cont { margin-left: 1em }
 @keyframes target {
-	0%, 30% { background: #f70 }
+	0%, 30% { background: #fc8 }
 }
 main div { padding: 1px 0 }
 :target {
 	margin-top: -4vh;
 	padding-top: calc(4vh + 1px);
+	position: relative;
 }
-:target > div { position: relative }
-:target > div::before {
+:target::before {
 	content: '';
 	animation: target 1s;
 	position: absolute;
-	top: -0.5em; right: -0.5em; bottom: -0.5em; left: -0.5em;
+	top: calc(1px + 4vh); right: -0.5em; bottom: 0; left: -0.5em;
 	z-index: -1;
 }
 article h1::first-letter { text-transform: capitalize }
-article h1 a {
+h1 a {
 	text-decoration: none;
 	color: #444;
 }
@@ -120,6 +126,7 @@ h1 {
 	font-size: 1.4em;
 	margin: 0;
 }
+h1:first-child { margin: 1px 0 }
 h2 { font-size: 1.2em }
 h3 { font-size: 1em }
 h4 { font-size: 0.9em }
