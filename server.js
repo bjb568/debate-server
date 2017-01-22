@@ -35,7 +35,9 @@ const createDir = o(function*(p, cb) {
 	try {
 		yield fs.stat(p, yield);
 	} catch (e) {
+		console.log('Creating dir ', p);
 		yield fs.mkdir(p, yield);
+		if (path.extname(p) == '.card') yield createFile(path.join(p, 'card.h'), yield);
 	}
 	cb(null);
 });
