@@ -68,7 +68,10 @@ const readDir = o(function*(p, prefix, cb) {
 	} catch (e) {}
 	const extname = path.extname(p);
 	let ret = {p, extname, name: path.basename(p, extname), hash: hash(p), cards: []};
-	ret.jump = '<span class="' + (ret.name.length == 1 ? 'inline' : '') + (extname ? ' nav' + extname.substr(1) : '') + '"><a href="' + prefix + '#' + ret.hash + '">' + ret.name + '</a></span> ';
+	ret.jump = `<span class="'${
+		ret.name.length == 1 ? 'inline' : ''}${
+		extname ? ' nav' + extname.substr(1) : ''
+		}"><a href="${prefix}#${ret.hash}">${ret.name}</a></span> `;
 	if (extname == '.card') ret.cards.push({jump: ret.jump, name: ret.name});
 	if (stat && stat.isDirectory()) {
 		ret.isDir = true;
@@ -132,10 +135,16 @@ const writeFoot = o(function*(res, cb) {
 	res.end(yield fs.readFile('./html/foot.html', yield));
 	cb();
 });
+const className = {
+	'a': 'speech1',
+	'q': 'question',
+	'q.master': 'question question-master'
+};
 const writeCase = o(function*(res, p, cb) {
+	console.log(path.basename(p));
 	res.write(`<div id="${hash(p)}" class="cont">
 		<a href="/edit/${encodeURIComponent(p)}" class="right">Edit</a>
-		<div class="leaf${path.basename(p) == 'a' ? ' speech1' : ''}">${yield read(p, 'md', yield)}</div>
+		<div class="leaf ${className[path.basename(p)] || ''}">${yield read(p, 'md', yield)}</div>
 	</div>`);
 	cb();
 });

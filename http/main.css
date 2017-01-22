@@ -97,6 +97,8 @@ h1 a {
 .leaf > :first-child, li > p:first-child { margin-top: 0 }
 .leaf > :last-child { margin-bottom: 0 }
 .speech1 { border-left: 1px solid #f00 }
+.question { background: #ffd }
+.question-master { border-left: 1px solid #dd0 }
 .bmar { margin-bottom: 2em }
 .ta-cont, .ta-cont * { width: 100% }
 .ta-cont {
