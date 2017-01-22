@@ -94,7 +94,7 @@ h1 a {
 .card-h { background: #dfd }
 .navcard a { color: #040 }
 #cards .navcard a { color: #000 }
-.leaf > :first-child { margin-top: 0 }
+.leaf > :first-child, li > p:first-child { margin-top: 0 }
 .leaf > :last-child { margin-bottom: 0 }
 .speech1 { border-left: 1px solid #f00 }
 .bmar { margin-bottom: 2em }
