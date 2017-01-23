@@ -26,22 +26,27 @@ const nameSort = (a, b) => {
 	return 0;
 };
 const createDir = o(function*(p, cb) {
+	console.log('Creating dir ', p);
+	yield fs.mkdir(p, yield);
+	if (path.extname(p) == '.card') yield createFileR(path.join(p, 'card.h'), yield);
+	yield createFileR(path.join(p, 'index'), yield);
+	cb(null);
+});
+const createDirR = o(function*(p, cb) {
 	try {
 		yield fs.stat(path.dirname(p), yield);
 		yield fs.mkdir(p, yield);
 	} catch (e) {
-		yield createDir(path.dirname(p), yield);
+		yield createDirR(path.dirname(p), yield);
 	}
 	try {
 		yield fs.stat(p, yield);
 	} catch (e) {
-		console.log('Creating dir ', p);
-		yield fs.mkdir(p, yield);
-		if (path.extname(p) == '.card') yield createFile(path.join(p, 'card.h'), yield);
+		yield createDir(p, yield);
 	}
 	cb(null);
 });
-const createFile = o(function*(p, cb) {
+const createFileR = o(function*(p, cb) {
 	try {
 		yield fs.stat(path.dirname(p), yield);
 	} catch (e) {
@@ -57,9 +62,33 @@ const createFile = o(function*(p, cb) {
 });
 const read = o(function*(p, prop, cb) {
 	p = path.join(config.dataPath, p);
-	yield createFile(p, yield);
+	yield createFileR(p, yield);
 	cb(null, (yield fs.readFile(p, yield))[prop]());
 });
+const endReadDir = function(indexFile, ret, cb) {
+	ret.sub.sort(nameSort);
+	(indexFile || '').toString().split('\n').forEach((itemName, i) => {
+		itemName = itemName.replace(/^- |\d+$/g, '');
+		let j = -1;
+		for (let k = 0; k < ret.sub.length; k++) {
+			if (ret.sub[k].name == itemName) {
+				j = k;
+				break;
+			}
+		}
+		if (j != -1) {
+			const subI = ret.sub[i];
+			ret.sub[i] = ret.sub[j];
+			ret.sub[j] = subI;
+		}
+	});
+	ret.jump += '<div>';
+	ret.sub.forEach((subp) => ret.jump += subp.jump);
+	ret.jump += '</div>';
+	ret.sub.forEach((subp) => (ret.cards = ret.cards.concat(subp.cards)));
+	ret.cards = ret.cards.sort(nameSort);
+	return cb(null, ret);
+};
 const readDir = o(function*(p, prefix, cb) {
 	const fullP = path.join(config.dataPath, p);
 	let stat;
@@ -82,38 +111,20 @@ const readDir = o(function*(p, prefix, cb) {
 		let indexFile;
 		try {
 			indexFile = yield fs.readFile(path.join(fullP, 'index'), yield);
-		} catch (e) {}
-		list.forEach(function(subp) {
-			if (['index', 'resolution', 'card.h'].includes(subp) || subp[0] == '.') return --pending;
-			readDir(path.join(p, subp), prefix + (['aff', 'neg'].includes(subp) ? '/' + subp + '/' : ''), (err, ps) => {
+		} catch (e) {
+			yield createFileR(path.join(fullP, 'index'), yield);
+		}
+		list.forEach(o(function*(subp) {
+			if (['index', 'resolution', 'card.h'].includes(subp) || subp[0] == '.') {
+				if (!--pending) return cb(null, yield endReadDir(indexFile, ret, yield));
+				return;
+			}
+			readDir(path.join(p, subp), prefix + (['aff', 'neg'].includes(subp) ? '/' + subp + '/' : ''), o(function*(err, ps) {
 				if (err && pending > 0) return (pending = 0) || cb(err);
 				ret.sub.push(ps);
-				if (!--pending) {
-					ret.sub.sort(nameSort);
-					(indexFile || '').toString().split('\n').forEach((itemName, i) => {
-						itemName = itemName.replace(/^- |\d+$/g, '');
-						let j = -1;
-						for (let k = 0; k < ret.sub.length; k++) {
-							if (ret.sub[k].name == itemName) {
-								j = k;
-								break;
-							}
-						}
-						if (j != -1) {
-							const subI = ret.sub[i];
-							ret.sub[i] = ret.sub[j];
-							ret.sub[j] = subI;
-						}
-					});
-					ret.jump += '<div>';
-					ret.sub.forEach((subp) => ret.jump += subp.jump);
-					ret.jump += '</div>';
-					ret.sub.forEach((subp) => (ret.cards = ret.cards.concat(subp.cards)));
-					ret.cards = ret.cards.sort(nameSort);
-					return cb(null, ret);
-				}
-			});
-		});
+				if (!--pending) return cb(null, yield endReadDir(indexFile, ret, yield));
+			}));
+		}));
 	} else return cb(null, ret);
 });
 const writeHead = o(function*(res, options, cb) {
@@ -143,8 +154,10 @@ const className = {
 const writeCase = o(function*(res, p, cb) {
 	console.log(path.basename(p));
 	res.write(`<div id="${hash(p)}" class="cont">
-		<a href="/edit/${encodeURIComponent(p)}" class="right">Edit</a>
-		<div class="leaf ${className[path.basename(p)] || ''}">${yield read(p, 'md', yield)}</div>
+		<div class="leaf ${className[path.basename(p)] || ''}">
+			<a href="/edit/${encodeURIComponent(p)}" class="right">Edit</a>
+			${yield read(p, 'md', yield)}
+		</div>
 	</div>`);
 	cb();
 });
@@ -153,8 +166,11 @@ const writeCardH = o(function*(res, p, cb) {
 	res.write(`
 		<article id="${hash(p)}" class="cont card">
 		<div>
-			<a href="/edit/${encodeURIComponent(path.join(p, 'card.h'))}" class="right">Edit</a>
-			<div class="leaf card-h"><h1><a href="${card[0].html()}">${path.basename(p, '.card')}</a></h1>${(card[1] || '').md()}</div>`
+			<div class="leaf card-h">
+				<a href="/edit/${encodeURIComponent(path.join(p, 'card.h'))}" class="right">Edit</a>
+				<h1><a href="${card[0].html()}">${path.basename(p, '.card')}</a></h1>
+				${(card[1] || '').md()}
+			</div>`
 	);
 	cb();
 });
@@ -171,11 +187,15 @@ const writeCaseR = o(function*(res, tree, cb) {
 	if (path.extname(tree.p) == '.card') res.write('</article>');
 	cb();
 });
+function pathPrefix(p) {
+	if (!p.indexOf('/aff/')) return '/aff/';
+	if (!p.indexOf('/neg/')) return '/neg/';
+	return '/';
+}
 http.createServer(o(function*(req, res) {
 	req.url = url.parse(req.url, true);
 	console.log(req.method, req.url.pathname);
-	let navLoc = req.url.pathname;
-	if (!['/aff/', '/neg/'].includes(navLoc)) navLoc = '/';
+	let navLoc = pathPrefix(req.url.pathname);
 	const tree = yield readDir(navLoc, '', yield);
 	if (req.url.pathname == '/') {
 		yield writeHead(res, {
@@ -208,7 +228,7 @@ http.createServer(o(function*(req, res) {
 		}, yield);
 		const p = decodeURIComponent(req.url.pathname.substr(6));
 		const data = yield read(p, 'html', yield);
-		res.write(`<h1><a href="/#${hash(p)}">${p} <del class="right">Edit</del></a></h1><div class="ta-cont">
+		res.write(`<h1><a href="${pathPrefix(p)}#${hash(p)}">${p} <del class="right">Edit</del></a></h1><div class="ta-cont">
 			<textarea id="ta" autofocus="">${data}</textarea>
 			<pre></pre>
 		</div>`);
