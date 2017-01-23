@@ -26,9 +26,48 @@ addEventListener('input', function() {
 		timeout = setTimeout(sendUpdate, 100);
 	}
 });
+function formatTime(t) {
+	t = Math.floor(t / 100) / 10;
+	const s = t % 60;
+	return Math.floor(t / 60) + ':' + (s < 10 ? '0' + s.toFixed(1) : s.toFixed(1));
+}
+const mainTimer = {time: 0};
+const pTimer = {time: 0};
+const oTimer = {time: 0};
+function updateTimers() {
+	const now = new Date().getTime();
+	if (mainTimer.running) {
+		mainTimer.time += now - mainTimer.lastTime;
+		mainTimer.lastTime = now;
+		document.getElementById('maintime').firstChild.nodeValue = formatTime(mainTimer.time);
+	}
+	if (pTimer.running) {
+		pTimer.time += now - pTimer.lastTime;
+		pTimer.lastTime = now;
+		document.getElementById('ptime').firstChild.nodeValue = formatTime(pTimer.time);
+	}
+	if (oTimer.running) {
+		oTimer.time += now - oTimer.lastTime;
+		oTimer.lastTime = now;
+		document.getElementById('otime').firstChild.nodeValue = formatTime(oTimer.time);
+	}
+	requestAnimationFrame(updateTimers);
+}
 addEventListener('keypress', function(e) {
 	if (e.keyCode == 115 && e.metaKey) {
 		if (document.getElementById('ta')) sendUpdate();
+		e.preventDefault();
+	} else if (e.keyCode == 32 && document.activeElement == document.body) {
+		mainTimer.running ^= 1;
+		mainTimer.lastTime = new Date().getTime();
+		e.preventDefault();
+	} else if (e.keyCode == 112 && document.activeElement == document.body) {
+		pTimer.running ^= 1;
+		pTimer.lastTime = new Date().getTime();
+		e.preventDefault();
+	} else if (e.keyCode == 111 && document.activeElement == document.body) {
+		oTimer.running ^= 1;
+		oTimer.lastTime = new Date().getTime();
 		e.preventDefault();
 	}
 });
@@ -43,6 +82,7 @@ addEventListener('DOMContentLoaded', function() {
 		ta.addEventListener('keypress', textareaHandler);
 	});
 	editing = document.getElementById('editing');
+	updateTimers();
 });
 function textareaHandler(e, s) {
 	if (this.noHandle) return delete this.nHandle;

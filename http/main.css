@@ -34,6 +34,25 @@ header {
 	height: 4vmin;
 }
 body.editpage header { background: #adf }
+#time {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	padding: 0 1em;
+	background: #fef;
+	font-family: 'Monaco', monospace;
+}
+#ptimes {
+	display: inline-block;
+	font-size: 0.9em;
+	line-height: 1.1;
+	padding-right: 1em;
+}
+#maintime {
+	font-size: 1.6em;
+	vertical-align: bottom;
+}
 body.speech1 .leaf:not(.speech1) { display: none }
 nav { margin-right: 0.5em }
 nav > div {
@@ -94,7 +113,7 @@ h1 a {
 .card-h { background: #dfd }
 .navcard a { color: #040 }
 #cards .navcard a { color: #000 }
-.leaf > :first-child, li > p:first-child { margin-top: 0 }
+.leaf > :nth-child(2), p:first-child { margin-top: 0 }
 .leaf > :last-child { margin-bottom: 0 }
 .speech1 { border-left: 1px solid #f00 }
 .question { background: #ffd }
