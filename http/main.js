@@ -75,6 +75,9 @@ addEventListener('DOMContentLoaded', function() {
 	document.getElementsByTagName('textarea').forEach((ta) => {
 		ta.nextElementSibling.textContent = ta.value + '\n';
 		ta.parentNode.style.height = ta.nextElementSibling.offsetHeight + 'px';
+		requestAnimationFrame(() => {
+			ta.parentNode.style.height = ta.nextElementSibling.offsetHeight + 'px';
+		});
 		ta.addEventListener('keyup', function() {
 			textareaHandler.call(this, true);
 		});
