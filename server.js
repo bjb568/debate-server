@@ -66,9 +66,9 @@ const read = o(function*(p, prop, cb) {
 	cb(null, (yield fs.readFile(p, yield))[prop]());
 });
 const endReadDir = function(indexFile, ret, cb) {
-	ret.sub.sort(nameSort);
+	ret.sub = ret.sub.sort(nameSort);
 	(indexFile || '').toString().split('\n').forEach((itemName, i) => {
-		itemName = itemName.replace(/^- |\d+$/g, '');
+		itemName = itemName.replace(/^- /g, '');
 		let j = -1;
 		for (let k = 0; k < ret.sub.length; k++) {
 			if (ret.sub[k].name == itemName) {
