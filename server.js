@@ -119,7 +119,7 @@ const readDir = o(function*(p, prefix, cb) {
 				if (!--pending) return cb(null, yield endReadDir(indexFile, ret, yield));
 				return;
 			}
-			readDir(path.join(p, subp), prefix + (['aff', 'neg'].includes(subp) ? '/' + subp + '/' : ''), o(function*(err, ps) {
+			readDir(path.join(p, subp), prefix + (['aff', 'neg', 'misc'].includes(subp) ? '/' + subp + '/' : ''), o(function*(err, ps) {
 				if (err && pending > 0) return (pending = 0) || cb(err);
 				ret.sub.push(ps);
 				if (!--pending) return cb(null, yield endReadDir(indexFile, ret, yield));
@@ -162,7 +162,8 @@ const writeCase = o(function*(res, p, cb) {
 	cb();
 });
 const writeCardH = o(function*(res, p, cb) {
-	const card = (yield fs.readFile(path.join(config.dataPath, p, 'card.h'), yield)).toString().split('\n', 2);
+	const cardStr = (yield fs.readFile(path.join(config.dataPath, p, 'card.h'), yield)).toString();
+	const card = [cardStr.substr(0, cardStr.indexOf('\n')), cardStr.substr(cardStr.indexOf('\n'))];
 	res.write(`
 		<article id="${hash(p)}" class="cont card">
 		<div>
@@ -190,6 +191,7 @@ const writeCaseR = o(function*(res, tree, cb) {
 function pathPrefix(p) {
 	if (!p.indexOf('/aff/')) return '/aff/';
 	if (!p.indexOf('/neg/')) return '/neg/';
+	if (!p.indexOf('/misc/')) return '/misc/';
 	return '/';
 }
 http.createServer(o(function*(req, res) {
@@ -204,7 +206,7 @@ http.createServer(o(function*(req, res) {
 		}, yield);
 		yield writeCase(res, 'notes', yield);
 		yield writeFoot(res, yield);
-	} else if (req.url.pathname == '/aff/' || req.url.pathname == '/neg/') {
+	} else if (req.url.pathname == '/aff/' || req.url.pathname == '/neg/' || req.url.pathname == '/misc/') {
 		yield writeHead(res, {
 			jumps: '<span><a href="/">Home</a></span><h1>' + req.url.pathname.replaceAll('/', '') + '</h1>' + tree.jump,
 			tree
