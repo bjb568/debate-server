@@ -39,35 +39,39 @@ function updateTimers() {
 	if (mainTimer.running) {
 		mainTimer.time += now - mainTimer.lastTime;
 		mainTimer.lastTime = now;
-		document.getElementById('maintime').firstChild.nodeValue = formatTime(mainTimer.time);
 	}
+	document.getElementById('maintime').firstChild.nodeValue = formatTime(mainTimer.time);
 	if (pTimer.running) {
 		pTimer.time += now - pTimer.lastTime;
 		pTimer.lastTime = now;
-		document.getElementById('ptime').firstChild.nodeValue = formatTime(pTimer.time);
 	}
+	document.getElementById('ptime').firstChild.nodeValue = formatTime(pTimer.time);
 	if (oTimer.running) {
 		oTimer.time += now - oTimer.lastTime;
 		oTimer.lastTime = now;
-		document.getElementById('otime').firstChild.nodeValue = formatTime(oTimer.time);
 	}
+	document.getElementById('otime').firstChild.nodeValue = formatTime(oTimer.time);
 	requestAnimationFrame(updateTimers);
 }
 addEventListener('keypress', function(e) {
+	const now = new Date().getTime();
 	if (e.keyCode == 115 && e.metaKey) {
 		if (document.getElementById('ta')) sendUpdate();
 		e.preventDefault();
 	} else if (e.keyCode == 32 && document.activeElement == document.body) {
-		mainTimer.running ^= 1;
-		mainTimer.lastTime = new Date().getTime();
+		if (mainTimer.lastTap > now - 300) mainTimer.running = mainTimer.time = 0;
+		else mainTimer.running ^= 1;
+		mainTimer.lastTap = mainTimer.lastTime = now;
 		e.preventDefault();
 	} else if (e.keyCode == 112 && document.activeElement == document.body) {
-		pTimer.running ^= 1;
-		pTimer.lastTime = new Date().getTime();
+		if (pTimer.lastTap > now - 300) pTimer.running = pTimer.time = 0;
+		else pTimer.running ^= 1;
+		pTimer.lastTap = pTimer.lastTime = now;
 		e.preventDefault();
 	} else if (e.keyCode == 111 && document.activeElement == document.body) {
-		oTimer.running ^= 1;
-		oTimer.lastTime = new Date().getTime();
+		if (oTimer.lastTap > now - 300) oTimer.running = oTimer.time = 0;
+		else oTimer.running ^= 1;
+		oTimer.lastTap = oTimer.lastTime = now;
 		e.preventDefault();
 	}
 });
