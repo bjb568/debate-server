@@ -75,7 +75,7 @@ nav > div > div { padding: 0.5em 1em }
 	transition: color 0.3s, height 0.3s;
 	overflow: hidden;
 }
-#jumps span a {
+#jumps span:not(:first-child) a {
 	display: inline-block;
 	width: 100%;
 	transition: color 0.3s, height 0.3s;
