@@ -70,6 +70,20 @@ nav > div > div { padding: 0.5em 1em }
 	border-left: 1px solid #aaa;
 	padding-left: 9px;
 }
+#jumps span {
+	height: 1.3em;
+	transition: color 0.3s, height 0.3s;
+	overflow: hidden;
+}
+#jumps span a {
+	display: inline-block;
+	width: 100%;
+	transition: color 0.3s, height 0.3s;
+}
+#jumps div div:not(:hover) div span { height: 0.6em }
+#jumps div div:not(:hover) div div span { height: 0.3em }
+#jumps div div:not(:hover) span a { color: #bbb }
+#jumps div div:not(:hover) div span a { color: #eee }
 nav > div div > * { display: block }
 nav a {
 	white-space: nowrap;
