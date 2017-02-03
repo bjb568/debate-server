@@ -68,13 +68,14 @@ const read = o(function*(p, prop, cb) {
 const endReadDir = function(indexFile, ret, cb) {
 	ret.sub = ret.sub.sort(nameSort);
 	(indexFile || '').toString().split('\n').forEach((itemName, i) => {
-		itemName = itemName.replace(/^- /g, '');
+		const replaceRegex = /^- |\s*\d*(\.card)?$/g;
+		itemName = itemName.replace(replaceRegex, '');
 		let j = -1;
 		for (let k = 0; k < ret.sub.length; k++) {
-			if (ret.sub[k].name == itemName) {
+			if (ret.sub[k].name.replace(replaceRegex, '') == itemName) {
 				j = k;
 				break;
-			}
+			} else console.log(ret.sub[k].name.replace(replaceRegex, ''));
 		}
 		if (j != -1) {
 			const subI = ret.sub[i];
@@ -152,7 +153,6 @@ const className = {
 	'q.master': 'question question-master'
 };
 const writeCase = o(function*(res, p, cb) {
-	console.log(path.basename(p));
 	res.write(`<div id="${hash(p)}" class="cont">
 		<div class="leaf ${className[path.basename(p)] || ''}">
 			<a href="/edit/${encodeURIComponent(p)}" class="right">Edit</a>
