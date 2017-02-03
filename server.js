@@ -219,7 +219,7 @@ http.createServer(o(function*(req, res) {
 		req.on('data', data => post += data);
 		yield req.on('end', yield);
 		const p = path.join(config.dataPath, decodeURIComponent((url.parse(req.headers.referer || '').pathname || '').substr(6)));
-		yield fs.writeFile(p, post, yield);
+		yield fs.writeFile(p, post.sanitize(), yield);
 		res.writeHead(204);
 		res.end();
 	} else if (req.url.pathname.substr(0, 6) == '/edit/') {
