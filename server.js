@@ -75,7 +75,7 @@ const endReadDir = function(indexFile, ret, cb) {
 			if (ret.sub[k].name.replace(replaceRegex, '') == itemName) {
 				j = k;
 				break;
-			} else console.log(ret.sub[k].name.replace(replaceRegex, ''));
+			}
 		}
 		if (j != -1) {
 			const subI = ret.sub[i];

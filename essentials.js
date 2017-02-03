@@ -23,6 +23,7 @@ function smd(input) {
 		.replaceAll('\u0001', '^')
 		.replace(/\[(.+?)\|(.+?)]/g, '<abbr title="$2">$1</abbr>')
 		.replaceAll('\u0002', '[')
+		.replace(/\[\[\[(\d+)]]]/g, '<sup class="time-ref">[ $1 ]</sup>')
 		.replace(/\[\[(\d+)](.*?)]/g, '<sup class="reference" title="$2">[$1]</sup>')
 		.replace(/\[\[ !\[([^[\]]+?)]\(https?:\/\/([^\s("\\]+?\.[^\s"\\]+?)\) ]]/g, '<img alt="$1" class="center" src="https://$2" />')
 		.replace(/!\[([^[\]]+?)]\(https?:\/\/([^\s("\\]+?\.[^\s"\\]+?)\)/g, '<img alt="$1" src="https://$2" />')
