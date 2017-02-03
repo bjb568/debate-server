@@ -20,7 +20,7 @@ main {
 	flex-basis: 0;
 	flex-grow: 1;
 }
-#jumps > span:first-child a { font-weight: bold }
+.jumps > span:first-child a { font-weight: bold }
 header, nav > div {
 	position: -webkit-sticky;
 	position: sticky;
@@ -65,25 +65,25 @@ nav > div > div { padding: 0.5em 1em }
 #cards { background: #dfd }
 #other { background: #def }
 #ctrls { background: #fed }
-#jumps div {
+.jumps div {
 	margin-left: 2px;
 	border-left: 1px solid #aaa;
 	padding-left: 9px;
 }
-#jumps span {
+.jumps span {
 	height: 1.3em;
 	transition: color 0.3s, height 0.3s;
 	overflow: hidden;
 }
-#jumps span:not(:first-child) a {
+.jumps span:not(:first-child) a {
 	display: inline-block;
 	width: 100%;
 	transition: color 0.3s, height 0.3s;
 }
-#jumps div div:not(:hover) div span { height: 0.6em }
-#jumps div div:not(:hover) div div span { height: 0.3em }
-#jumps div div:not(:hover) span a { color: #bbb }
-#jumps div div:not(:hover) div span a { color: #eee }
+.jumps div div:not(:hover) div span { height: 0.6em }
+.jumps div div:not(:hover) div div span { height: 0.3em }
+.jumps div div:not(:hover) span a { color: #bbb }
+.jumps div div:not(:hover) div span a { color: #eee }
 nav > div div > * { display: block }
 nav a {
 	white-space: nowrap;

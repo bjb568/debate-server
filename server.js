@@ -199,17 +199,20 @@ http.createServer(o(function*(req, res) {
 	console.log(req.method, req.url.pathname);
 	let navLoc = pathPrefix(req.url.pathname);
 	const tree = yield readDir(navLoc, '', yield);
+	const miscTree = yield readDir('/misc/', '/misc/', yield);
 	if (req.url.pathname == '/') {
 		yield writeHead(res, {
 			jumps: '<span><a href="/aff/">Aff</a> <a class="right" href="/neg/">Neg</a></span>' + tree.jump,
-			tree
+			tree,
+			other: miscTree.jump
 		}, yield);
 		yield writeCase(res, 'notes', yield);
 		yield writeFoot(res, yield);
 	} else if (req.url.pathname == '/aff/' || req.url.pathname == '/neg/' || req.url.pathname == '/misc/') {
 		yield writeHead(res, {
 			jumps: '<span><a href="/">Home</a></span><h1>' + req.url.pathname.replaceAll('/', '') + '</h1>' + tree.jump,
-			tree
+			tree,
+			other: miscTree.jump
 		}, yield);
 		yield writeCaseR(res, tree, yield);
 		yield writeFoot(res, yield);
