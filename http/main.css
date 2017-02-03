@@ -173,8 +173,8 @@ blockquote {
 	border-left: 2px solid #008;
 	padding-left: 1em;
 }
-div > p > q::before, blockquote > :first-child::before { content: '(quote) ' }
-div > p > q::after, blockquote > :last-child::after { content: ' (end quote)' }
+/* div > p > q::before, blockquote > :first-child::before { content: '(quote) ' }
+div > p > q::after, blockquote > :last-child::after { content: ' (end quote)' } */
 div > p > q::before, blockquote > :first-child::before, div > p > q::after, blockquote > :last-child::after {
 	font-size: 0.7em;
 	font-style: italic;
