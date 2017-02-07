@@ -161,10 +161,10 @@ function md(input) {
 				ul += '<li>' + md(li) + '</li>';
 				li = '';
 			}
-			if (arr[i + 1] && (arr[i + 1].substr(0, 2) == '- ' || arr[i + 1] && arr[i + 1].substr(0, 2) == '* ')) {
+			if (arr[i + 1] && (arr[i + 1].substr(0, 2) == '- ' || arr[i + 1].substr(0, 2) == '* ')) {
 				ul += '<li>' + imd(val) + '</li>';
 				return '';
-			} else if (arr[i + 1] && (arr[i + 1][0] == '\t' || arr[i + 1] && arr[i + 1].substr(0, 4) == '    ')) {
+			} else if (arr[i + 1] && (arr[i + 1][0] == '\t' || arr[i + 1].substr(0, 4) == '    ')) {
 				li += val + '\n';
 				return '';
 			} else {
@@ -182,7 +182,7 @@ function md(input) {
 			if (/^(\d+|[A-z])[.)] /.test(arr[i + 1])) {
 				ol += '<li>' + imd(val) + '</li>';
 				return '';
-			} else if (arr[i + 1] && (arr[i + 1][0] == '\t' || arr[i + 1] && arr[i + 1].substr(0, 4) == '    ')) {
+			} else if (arr[i + 1] && (arr[i + 1][0] == '\t' || arr[i + 1].substr(0, 4) == '    ')) {
 				li += val + '\n';
 				return '';
 			} else {
@@ -192,7 +192,7 @@ function md(input) {
 			}
 		} else if (li && val[0] == '\t') {
 			li += val.substr(1) + '\n';
-			if (ul && (!arr[i + 1] || (arr[i + 1][0] != '\t' && arr[i + 1].substr(0, 4) != '    ' && arr[i + 1].substr(2) != '- ' && arr[i + 1].substr(2) != '* '))) {
+			if (ul && (!arr[i + 1] || (arr[i + 1][0] != '\t' && arr[i + 1].substr(0, 4) != '    ' && arr[i + 1].substr(0, 2) != '- ' && arr[i + 1].substr(0, 2) != '* '))) {
 				var arg = ul + '<li>' + md(li) + '</li>';
 				li = '';
 				return arg + '</ul>';
@@ -204,7 +204,7 @@ function md(input) {
 			return '';
 		} else if (li && val.substr(0, 4) == '    ') {
 			li += val.substr(4) + '\n';
-			if (ul && (!arr[i + 1] || (arr[i + 1][0] != '\t' && arr[i + 1].substr(0, 4) != '    ' && arr[i + 1].substr(2) != '- ' && arr[i + 1].substr(2) != '* '))) {
+			if (ul && (!arr[i + 1] || (arr[i + 1][0] != '\t' && arr[i + 1].substr(0, 4) != '    ' && arr[i + 1].substr(0, 2) != '- ' && arr[i + 1].substr(0, 2) != '* '))) {
 				var arg = ul + '<li>' + md(li) + '</li>';
 				li = '';
 				return arg + '</ul>';
