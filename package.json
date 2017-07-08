@@ -14,7 +14,6 @@
 	},
 	"dependencies": {
 		"yield-yield": "^1.0.1",
-		"read-yaml": "^1.0.0",
-		"write-yaml": "^0.2.2"
+		"diff": "^3.0.0"
 	}
 }

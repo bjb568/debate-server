@@ -54,6 +54,8 @@ body.editpage header { background: #adf }
 	vertical-align: bottom;
 }
 body.speech1 .leaf:not(.speech1) { display: none }
+body.card-h .leaf:not(.card-h) { display: none }
+body.question .leaf:not(.question) { display: none }
 nav { margin-right: 0.5em }
 nav > div {
 	max-height: calc(100vh - 4vmin);
@@ -92,7 +94,7 @@ nav a {
 }
 .right { float: right }
 :not(span) > .right { color: #444 }
-.right:not(del) { text-decoration: none }
+.right, del, ins { text-decoration: none }
 h1 .right {
 	font-size: 1rem;
 	font-weight: normal;
@@ -124,13 +126,14 @@ h1 a {
 	padding: 1em;
 	background: #f8f8f8;
 }
-.card-h { background: #dfd }
+body .card-h { background: #dfd }
 .navcard a { color: #040 }
 #cards .navcard a { color: #000 }
 .leaf > :nth-child(2), p:first-child { margin-top: 0 }
+p:first-child { margin-bottom: 0 }
 .leaf > :last-child { margin-bottom: 0 }
-.speech1 { border-left: 1px solid #f00 }
-.question { background: #ffd }
+body .speech1 { border-left: 1px solid #f00 }
+body .question { background: #ffd }
 .question-master { border-left: 1px solid #dd0 }
 .bmar { margin-bottom: 2em }
 .ta-cont, .ta-cont * { width: 100% }
@@ -174,13 +177,20 @@ blockquote {
 	padding-left: 1em;
 }
 /* div > p > q::before, blockquote > :first-child::before { content: '(quote) ' }
-div > p > q::after, blockquote > :last-child::after { content: ' (end quote)' } */
+div > p > q::after, blockquote > :last-child::after { content: ' (end quote)' }
 div > p > q::before, blockquote > :first-child::before, div > p > q::after, blockquote > :last-child::after {
 	font-size: 0.7em;
 	font-style: italic;
 	line-height: 1;
 	color: #888;
-}
+} */
 #editing { color: #888 }
 small, .time { color: #666 }
 .inline { display: inline }
+ins { color: #f00 }
+.cutcard { font-size: 0 }
+.cutcard mark, .cutcard .right { font-size: 1rem }
+del {
+	opacity: 0.5;
+	font-size: 0.3em;
+}

@@ -1,5 +1,5 @@
 # debate-server
-A yaml database frontend for debate cases
+A front-end for debate case viewing and editing
 
 To run:
 
@@ -7,9 +7,8 @@ To run:
 2. Run:
 
 		$ sudo npm install
-3. Create a `.yaml` data file
-4. Make sure that data file is specified in the `dataPath` attribute in `config.js`
-5. Start the server:
+3. See config.js
+4. Start the server:
 
 		$ node server
 

@@ -17,6 +17,8 @@ function sendUpdate() {
 }
 addEventListener('click', function(e) {
 	document.body.classList.toggle('speech1', document.getElementById('speech1').checked);
+	document.body.classList.toggle('card-h', document.getElementById('card-h').checked);
+	document.body.classList.toggle('question', document.getElementById('question').checked);
 });
 addEventListener('input', function() {
 	if (document.activeElement.parentNode.classList.contains('ta-cont')) {
@@ -31,9 +33,16 @@ function formatTime(t) {
 	const s = t % 60;
 	return Math.floor(t / 60) + ':' + (s < 10 ? '0' + s.toFixed(1) : s.toFixed(1));
 }
-const mainTimer = localStorage.mainTimer ? JSON.parse(localStorage.mainTimer) : {time: 0};
-const pTimer = localStorage.pTimer ? JSON.parse(localStorage.pTimer) : {time: 0};
-const oTimer = localStorage.oTimer ? JSON.parse(localStorage.oTimer) : {time: 0};
+let mainTimer = localStorage.mainTimer ? JSON.parse(localStorage.mainTimer) : {time: 0};
+let pTimer = localStorage.pTimer ? JSON.parse(localStorage.pTimer) : {time: 0};
+let oTimer = localStorage.oTimer ? JSON.parse(localStorage.oTimer) : {time: 0};
+addEventListener('visibilitychange', function() {
+	if (!document.hidden) {
+		mainTimer = localStorage.mainTimer ? JSON.parse(localStorage.mainTimer) : {time: 0};
+		pTimer = localStorage.pTimer ? JSON.parse(localStorage.pTimer) : {time: 0};
+		oTimer = localStorage.oTimer ? JSON.parse(localStorage.oTimer) : {time: 0};
+	}
+});
 function updateTimers() {
 	const now = new Date().getTime();
 	if (mainTimer.running) {
@@ -51,9 +60,11 @@ function updateTimers() {
 		oTimer.lastTime = now;
 	}
 	document.getElementById('otime').firstChild.nodeValue = formatTime(oTimer.time);
-	localStorage.mainTimer = JSON.stringify(mainTimer);
-	localStorage.pTimer = JSON.stringify(pTimer);
-	localStorage.oTimer = JSON.stringify(oTimer);
+	if (!document.hidden) {
+		localStorage.mainTimer = JSON.stringify(mainTimer);
+		localStorage.pTimer = JSON.stringify(pTimer);
+		localStorage.oTimer = JSON.stringify(oTimer);
+	}
 	requestAnimationFrame(updateTimers);
 }
 addEventListener('keypress', function(e) {
