@@ -7,6 +7,7 @@ html {
 	font: 130% sans-serif;
 	line-height: 1.5;
 }
+a, label { cursor: pointer }
 body {
 	margin: 0;
 	-webkit-text-size-adjust: none;
@@ -14,6 +15,7 @@ body {
 	display: flex;
 	flex-direction: column;
 }
+body:not(.source) .source, body:not(.controls) .controls, body:not(.brackets) ins:before, body:not(.brackets) ins:after { display: none }
 body > div { display: flex }
 header, main { padding: 0.5em }
 main {
@@ -33,7 +35,6 @@ header {
 	font-size: 1.75vmin;
 	height: 4vmin;
 }
-body.editpage header { background: #adf }
 #time {
 	position: absolute;
 	top: 0;
@@ -53,9 +54,6 @@ body.editpage header { background: #adf }
 	font-size: 1.6em;
 	vertical-align: bottom;
 }
-body.speech1 .leaf:not(.speech1) { display: none }
-body.card-h .leaf:not(.card-h) { display: none }
-body.question .leaf:not(.question) { display: none }
 nav { margin-right: 0.5em }
 nav > div {
 	max-height: calc(100vh - 4vmin);
@@ -63,14 +61,16 @@ nav > div {
 	top: 4vmin;
 }
 nav > div > div { padding: 0.5em 1em }
-#jumps { background: #ffd }
-#cards { background: #dfd }
-#other { background: #def }
+#jumps { background: #def }
 #ctrls { background: #fed }
 .jumps div {
 	margin-left: 2px;
 	border-left: 1px solid #aaa;
 	padding-left: 9px;
+}
+.jumps .jump-folder {
+	color: #080;
+	font-size: 0.6em;
 }
 .jumps span {
 	height: 1.3em;
@@ -92,14 +92,17 @@ nav a {
 	color: #00f;
 	text-decoration: none;
 }
-.right { float: right }
-:not(span) > .right { color: #444 }
-.right, del, ins { text-decoration: none }
-h1 .right {
-	font-size: 1rem;
-	font-weight: normal;
+.right {
+	position: absolute;
+	margin-top: 0.5em;
+	right: 2em;
+	color: #04f;
+	font-size: 0.5em;
+	text-decoration: underline;
 }
-main > div > div > div .cont { margin-left: 1em }
+.right:not(:nth-child(2)) { margin-top: -1.5em }
+.right:active { color: #f00 }
+del, ins { text-decoration: none }
 @keyframes target {
 	0%, 30% { background: #fc8 }
 }
@@ -121,21 +124,25 @@ h1 a {
 	text-decoration: none;
 	color: #444;
 }
-.leaf {
-	margin: 0.5em 0;
-	padding: 1em;
+.folder, .card, .edit { margin: 1em 0 }
+.card {
+	padding: 0.5em 1em;
 	background: #f8f8f8;
+	white-space: pre-wrap;
 }
-body .card-h { background: #dfd }
-.navcard a { color: #040 }
-#cards .navcard a { color: #000 }
-.leaf > :nth-child(2), p:first-child { margin-top: 0 }
+.card > :nth-child(2), p:first-child { margin-top: 0 }
 p:first-child { margin-bottom: 0 }
-.leaf > :last-child { margin-bottom: 0 }
-body .speech1 { border-left: 1px solid #f00 }
-body .question { background: #ffd }
-.question-master { border-left: 1px solid #dd0 }
-.bmar { margin-bottom: 2em }
+.card > :last-child { margin-bottom: 0 }
+.folder {
+	padding: 0 1em;
+	border: 1px solid #aaa;
+	position: relative;
+}
+.folder > a:first-child {
+	position: absolute;
+	top: 0.5em;
+	font-size: 0.5em;
+}
 .ta-cont, .ta-cont * { width: 100% }
 .ta-cont {
 	position: relative;
@@ -157,9 +164,7 @@ body .question { background: #ffd }
 	padding: 3px;
 	visibility: hidden;
 }
-.ta-cont textarea {
-	bottom: 0;
-}
+.ta-cont textarea { bottom: 0 }
 h1 {
 	font-size: 1.4em;
 	margin: 0;
@@ -170,27 +175,11 @@ h3 { font-size: 1em }
 h4 { font-size: 0.9em }
 h5 { font-size: 0.8em }
 h6 { font-size: 0.7em }
-q, blockquote { color: #008 }
-blockquote {
-	margin-left: 2px;
-	border-left: 2px solid #008;
-	padding-left: 1em;
-}
-/* div > p > q::before, blockquote > :first-child::before { content: '(quote) ' }
-div > p > q::after, blockquote > :last-child::after { content: ' (end quote)' }
-div > p > q::before, blockquote > :first-child::before, div > p > q::after, blockquote > :last-child::after {
-	font-size: 0.7em;
-	font-style: italic;
-	line-height: 1;
-	color: #888;
-} */
-#editing { color: #888 }
+.edit:not([hidden]) { display: flex }
+.edit > div { width: 50% }
+.edit > div:last-child { margin-left: 1em }
 small, .time { color: #666 }
-.inline { display: inline }
 ins { color: #f00 }
-.cutcard { font-size: 0 }
-.cutcard mark, .cutcard .right { font-size: 1rem }
-del {
-	opacity: 0.5;
-	font-size: 0.3em;
-}
+del { font-size: 0.5em }
+ins:before { content: '[' }
+ins:after { content: ']' }

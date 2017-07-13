@@ -11,14 +11,21 @@ function request(uri, cb, params) {
 	};
 	return i;
 }
-let editing;
 function sendUpdate() {
-	request('/api/edit/', res => console.log(res), document.getElementById('ta').value);
+	if (document.activeElement.parentNode.classList.contains('ta-cont')) {
+		let pn = document.activeElement.parentNode.parentNode;
+		request(
+			'/api/edit/?path=' + encodeURIComponent(pn.dataset.path),
+			res => console.log(res),
+			pn.lastElementChild.firstElementChild.value + '#-\n' + pn.firstElementChild.firstElementChild.value
+		);
+	}
 }
+const toggles = ['source', 'brackets', 'controls'];
 addEventListener('click', function(e) {
-	document.body.classList.toggle('speech1', document.getElementById('speech1').checked);
-	document.body.classList.toggle('card-h', document.getElementById('card-h').checked);
-	document.body.classList.toggle('question', document.getElementById('question').checked);
+	for (let i = 0; i < toggles.length; i++) {
+		document.body.classList.toggle(toggles[i], localStorage[toggles[i]] = document.getElementById(toggles[i]).checked);
+	}
 });
 addEventListener('input', function() {
 	if (document.activeElement.parentNode.classList.contains('ta-cont')) {
@@ -70,7 +77,7 @@ function updateTimers() {
 addEventListener('keypress', function(e) {
 	const now = new Date().getTime();
 	if (e.keyCode == 115 && e.metaKey) {
-		if (document.getElementById('ta')) sendUpdate();
+		sendUpdate();
 		e.preventDefault();
 	} else if (e.keyCode == 32 && document.activeElement == document.body) {
 		if (mainTimer.lastTap > now - 300) mainTimer.running = mainTimer.time = 0;
@@ -89,6 +96,28 @@ addEventListener('keypress', function(e) {
 		e.preventDefault();
 	}
 });
+function smoothScroll(el, t, p, s) {
+	p = t - p;
+	var dist = el.getBoundingClientRect().top - document.getElementsByTagName('header')[0].offsetHeight,
+		now = new Date().getTime();
+	s = s || now;
+	var elapsed = now - s;
+	console.log(dist);
+	if (dist > 6 && document.body.scrollTop - document.body.scrollHeight + innerHeight) {
+		scrollBy(0, Math.min(dist - 5, Math.max(1, p * dist * elapsed * elapsed / 3000000)));
+		requestAnimationFrame(function(p) {
+			smoothScroll(el, p, t, s);
+		});
+	} else if (dist < -6) {
+		dist *= -1;
+		if (document.body.scrollTop) {
+			scrollBy(0, -Math.min(dist - 5, Math.max(1, p * dist * elapsed * elapsed / 3000000)));
+			requestAnimationFrame(function(p) {
+				smoothScroll(el, p, t, s);
+			});
+		}
+	}
+}
 addEventListener('DOMContentLoaded', function() {
 	document.getElementsByTagName('textarea').forEach((ta) => {
 		ta.nextElementSibling.textContent = ta.value + '\n';
@@ -102,8 +131,22 @@ addEventListener('DOMContentLoaded', function() {
 		ta.addEventListener('keydown', textareaHandler);
 		ta.addEventListener('keypress', textareaHandler);
 	});
-	editing = document.getElementById('editing');
 	updateTimers();
+	for (let i = 0; i < toggles.length; i++) {
+		document.body.classList.toggle(toggles[i], document.getElementById(toggles[i]).checked = localStorage[toggles[i]] == "true");
+	}
+	let e = document.getElementsByClassName('edit-button');
+	for (let i = 0; i < e.length; i++) {
+		e[i].addEventListener('click', function() {
+			this.nextElementSibling.hidden ^= 1;
+		});
+	}
+	e = document.getElementsByClassName('jump');
+	for (let i = 0; i < e.length; i++) {
+		e[i].addEventListener('click', function() {
+			smoothScroll(document.getElementById('jump-' + this.dataset.jump));
+		});
+	}
 });
 function textareaHandler(e, s) {
 	if (this.noHandle) return delete this.nHandle;
