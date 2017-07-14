@@ -159,11 +159,11 @@ const writeCard = o(function*(res, p, cb) {
 		<a class="right controls edit-button">Edit</a>
 		<div class="edit" data-path="${path.relative(config.dataPath, p).html()}" hidden="">
 			<div class="ta-cont">
-				<textarea id="ta" autofocus="">${o.html()}</textarea>
+				<textarea id="ta">${o.html()}</textarea>
 				<pre></pre>
 			</div>
 			<div class="ta-cont">
-				<textarea id="ta" autofocus="">${n.html()}</textarea>
+				<textarea id="ta">${n.html()}</textarea>
 				<pre></pre>
 			</div>
 		</div>
