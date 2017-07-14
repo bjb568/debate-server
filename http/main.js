@@ -141,7 +141,7 @@ addEventListener('DOMContentLoaded', function() {
 			let edit = this.nextElementSibling;
 			edit.hidden ^= 1;
 			edit.getElementsByTagName('textarea')[1].focus();
-			if (!edit.dataset.path) edit.dataset.path = edit.parentNode.firstElementChild.getAttribute('href') + prompt('path');
+			if (!edit.dataset.path) edit.dataset.path = location.pathname + edit.parentNode.firstElementChild.getAttribute('href') + prompt('path');
 		});
 	}
 	e = document.getElementsByClassName('jump');
