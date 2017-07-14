@@ -145,7 +145,7 @@ const writeFoot = o(function*(res, cb) {
 });
 const writeCard = o(function*(res, p, cb) {
 	let data = yield read(p, 'toString', yield),
-		c = data.indexOf('#-\n'),
+		c = data.indexOf('\n#-\n'),
 		o = c == -1 ? '' : data.substr(c + 3),
 		n = c == -1 ? data : data.substr(0, c),
 		d = diff.diffWordsWithSpace(o, n, {ignoreCase: true}),
@@ -180,6 +180,19 @@ const writeCase = o(function*(req, res, tree, cb) {
 		for (let i = 0; i < tree.sub.length; i++) {
 			yield writeCase(req, res, tree.sub[i], yield);
 		}
+		res.write(`
+			<a class="right controls edit-button">+</a>
+			<div class="edit" hidden="">
+				<div class="ta-cont">
+					<textarea id="ta"></textarea>
+					<pre></pre>
+				</div>
+				<div class="ta-cont">
+					<textarea id="ta"></textarea>
+					<pre></pre>
+				</div>
+			</div>
+		`);
 		res.write('</div>');
 	}
 	cb();
@@ -202,7 +215,10 @@ http.createServer(o(function*(req, res) {
 		req.on('data', data => post += data);
 		yield req.on('end', yield);
 		const p = path.join(config.dataPath, decodeURIComponent(req.url.query.path));
-		yield fs.writeFile(p, post.sanitize(), yield);
+		post = post.sanitize();
+		console.log(post.replace('\n#-\n', ''), post.replace('\n#-\n', '').length);
+		if (post.replace('\n#-\n', '')) yield fs.writeFile(p, post, yield);
+		else yield fs.unlink(p, yield);
 		res.writeHead(204);
 		res.end();
 	} else {

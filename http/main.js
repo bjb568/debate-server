@@ -17,7 +17,7 @@ function sendUpdate() {
 		request(
 			'/api/edit/?path=' + encodeURIComponent(pn.dataset.path),
 			res => console.log(res),
-			pn.lastElementChild.firstElementChild.value + '#-\n' + pn.firstElementChild.firstElementChild.value
+			pn.lastElementChild.firstElementChild.value + '\n#-\n' + pn.firstElementChild.firstElementChild.value
 		);
 	}
 }
@@ -133,12 +133,15 @@ addEventListener('DOMContentLoaded', function() {
 	});
 	updateTimers();
 	for (let i = 0; i < toggles.length; i++) {
-		document.body.classList.toggle(toggles[i], document.getElementById(toggles[i]).checked = localStorage[toggles[i]] == "true");
+		document.body.classList.toggle(toggles[i], document.getElementById(toggles[i]).checked = localStorage[toggles[i]] == 'true');
 	}
 	let e = document.getElementsByClassName('edit-button');
 	for (let i = 0; i < e.length; i++) {
 		e[i].addEventListener('click', function() {
-			this.nextElementSibling.hidden ^= 1;
+			let edit = this.nextElementSibling;
+			edit.hidden ^= 1;
+			edit.getElementsByTagName('textarea')[1].focus();
+			if (!edit.dataset.path) edit.dataset.path = edit.parentNode.firstElementChild.getAttribute('href') + prompt('path');
 		});
 	}
 	e = document.getElementsByClassName('jump');
