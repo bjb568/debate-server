@@ -239,7 +239,7 @@ http.createServer(o(function*(req, res) {
 		}
 		const tree = yield readDir(p, yield);
 		yield writeHead(res, tree, yield);
-		if (req.url.pathname != '/') res.write('<a class="controls" href="..">..</a>');
+		if (req.url.pathname != '/') res.write('<a class="controls back" href="..">..</a>');
 		yield writeCase(req, res, tree, yield);
 		yield writeFoot(res, yield);
 	}

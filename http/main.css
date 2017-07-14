@@ -21,6 +21,7 @@ header, main { padding: 0.5em }
 main {
 	flex-basis: 0;
 	flex-grow: 1;
+	position: relative;
 }
 .jumps > span:first-child a { font-weight: bold }
 header, nav > div {
@@ -91,6 +92,10 @@ nav a {
 	white-space: nowrap;
 	color: #00f;
 	text-decoration: none;
+}
+.back {
+	position: absolute;
+	top: 0;
 }
 .right {
 	position: absolute;
