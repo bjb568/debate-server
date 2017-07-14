@@ -26,7 +26,6 @@ const nameSort = (a, b) => {
 const createDir = o(function*(p, cb) {
 	console.log('Creating dir ', p);
 	yield fs.mkdir(p, yield);
-	yield createFileR(path.join(p, 'index'), yield);
 	cb(null);
 });
 const createDirR = o(function*(p, cb) {
@@ -146,9 +145,9 @@ const writeFoot = o(function*(res, cb) {
 const writeCard = o(function*(res, p, cb) {
 	let data = yield read(p, 'toString', yield),
 		c = data.indexOf('\n#-\n'),
-		o = c == -1 ? '' : data.substr(c + 3),
+		o = c == -1 ? '' : data.substr(c + 4),
 		n = c == -1 ? data : data.substr(0, c),
-		d = diff.diffWordsWithSpace(o, n, {ignoreCase: true}),
+		d = path.extname(p) == '.nh' ? [{value: n}] : diff.diffWordsWithSpace(o, n, {ignoreCase: true}),
 		r = '';
 	for (let i = 0; i < d.length; i++) {
 		if (d[i].added) r += '<ins>' + d[i].value.imd() + '</ins>';
@@ -216,7 +215,7 @@ http.createServer(o(function*(req, res) {
 		yield req.on('end', yield);
 		const p = path.join(config.dataPath, decodeURIComponent(req.url.query.path));
 		post = post.sanitize();
-		console.log(post.replace('\n#-\n', ''), post.replace('\n#-\n', '').length);
+		yield createFileR(p, yield);
 		if (post.replace('\n#-\n', '')) yield fs.writeFile(p, post, yield);
 		else yield fs.unlink(p, yield);
 		res.writeHead(204);
