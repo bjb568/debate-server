@@ -15,7 +15,7 @@ body {
 	display: flex;
 	flex-direction: column;
 }
-body:not(.source) .source, body:not(.controls) .controls, body:not(.brackets) ins:before, body:not(.brackets) ins:after { display: none }
+body:not(.source) .source, body:not(.controls) .controls, body:not(.brackets) ins::before, body:not(.brackets) ins::after { display: none }
 body > div { display: flex }
 header, main { padding: 0.5em }
 main {
@@ -180,6 +180,8 @@ h6 { font-size: 0.7em }
 .edit > div:last-child { margin-left: 1em }
 small, .time { color: #666 }
 ins { color: #f00 }
-del { font-size: 0.5em }
-ins:before { content: '[' }
-ins:after { content: ']' }
+del { opacity: 0.9 }
+body.minimize del { font-size: 0.5em }
+body:not(.minimize) del { opacity: 0.4 }
+ins::before { content: '[' }
+ins::after { content: ']' }

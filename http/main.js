@@ -21,7 +21,7 @@ function sendUpdate() {
 		);
 	}
 }
-const toggles = ['source', 'brackets', 'controls'];
+const toggles = ['source', 'minimize', 'brackets', 'controls'];
 addEventListener('click', function(e) {
 	for (let i = 0; i < toggles.length; i++) {
 		document.body.classList.toggle(toggles[i], localStorage[toggles[i]] = document.getElementById(toggles[i]).checked);
