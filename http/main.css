@@ -7,6 +7,10 @@ html {
 	font: 130% sans-serif;
 	line-height: 1.5;
 }
+@media print {
+	html { font-size: 80% }
+	header { display: none }
+}
 a, label { cursor: pointer }
 body {
 	margin: 0;
