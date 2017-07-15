@@ -144,11 +144,18 @@ const writeFoot = o(function*(res, cb) {
 });
 const writeCard = o(function*(res, p, cb) {
 	let data = yield read(p, 'toString', yield),
-		c = data.indexOf('\n#-\n'),
-		o = c == -1 ? '' : data.substr(c + 4),
+		i = data.indexOf('\n'),
+		name = '';
+	if (i != -1) {
+		name = data.substr(0, i);
+		data = data.substr(i);
+	}
+	console.log('name', name);
+	let c = data.indexOf('\n#-\n'),
+		o = c == -1 ? data : data.substr(c + 4),
 		n = c == -1 ? data : data.substr(0, c),
 		d = path.extname(p) == '.nh' ? [{value: n}] : diff.diffWordsWithSpace(o, n, {ignoreCase: true}),
-		r = '';
+		r = name.imd();
 	for (let i = 0; i < d.length; i++) {
 		if (d[i].added) r += '<ins>' + d[i].value.imd() + '</ins>';
 		else if (d[i].removed) r += '<del class="source">' + d[i].value.imd() + '</del>';
@@ -158,11 +165,11 @@ const writeCard = o(function*(res, p, cb) {
 		<a class="right controls edit-button">Edit</a>
 		<div class="edit" data-path="${path.relative(config.dataPath, p).html()}" hidden="">
 			<div class="ta-cont">
-				<textarea id="ta">${o.html()}</textarea>
+				<textarea id="ta">${c == -1 ? '' : o.html()}</textarea>
 				<pre></pre>
 			</div>
 			<div class="ta-cont">
-				<textarea id="ta">${n.html()}</textarea>
+				<textarea id="ta">${name.html() + n.html()}</textarea>
 				<pre></pre>
 			</div>
 		</div>

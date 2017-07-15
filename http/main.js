@@ -17,7 +17,7 @@ function sendUpdate() {
 		request(
 			'/api/edit/?path=' + encodeURIComponent(pn.dataset.path),
 			res => console.log(res),
-			pn.lastElementChild.firstElementChild.value + '\n#-\n' + pn.firstElementChild.firstElementChild.value
+			pn.lastElementChild.firstElementChild.value + (pn.firstElementChild.firstElementChild.value ? '\n#-\n' + pn.firstElementChild.firstElementChild.value : '')
 		);
 	}
 }
