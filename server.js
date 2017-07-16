@@ -150,7 +150,6 @@ const writeCard = o(function*(res, p, cb) {
 		name = data.substr(0, i);
 		data = data.substr(i);
 	}
-	console.log('name', name);
 	let c = data.indexOf('\n#-\n'),
 		o = c == -1 ? data : data.substr(c + 4),
 		n = c == -1 ? data : data.substr(0, c),
@@ -183,6 +182,19 @@ const writeCase = o(function*(req, res, tree, cb) {
 		res.write(`<div class="folder" id="jump-${path.relative(config.dataPath, tree.p)}">`);
 		const p = path.relative(path.join(config.dataPath, req.url.pathname), tree.p);
 		res.write('<a class="controls" href="' + p + '/">' + p.html() + '</a>');
+		res.write(`
+			<a class="right controls edit-button">Index</a>
+			<div class="edit" data-path="${path.relative(config.dataPath, path.join(tree.p, 'index')).html()}" hidden="">
+				<div class="ta-cont" hidden="">
+					<textarea id="ta"></textarea>
+					<pre></pre>
+				</div>
+				<div class="ta-cont">
+					<textarea id="ta">${yield read(path.join(tree.p, 'index'), 'html', yield)}</textarea>
+					<pre></pre>
+				</div>
+			</div>
+		`);
 		for (let i = 0; i < tree.sub.length; i++) {
 			yield writeCase(req, res, tree.sub[i], yield);
 		}
