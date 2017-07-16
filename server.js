@@ -172,7 +172,7 @@ const writeCard = o(function*(res, p, cb) {
 				<pre></pre>
 			</div>
 		</div>
-		<div class="card" id="jump-${path.relative(config.dataPath, p)}">${r}</div>
+		<div class="card${c == -1 ? '' : ' cut'}" id="jump-${path.relative(config.dataPath, p)}">${r}</div>
 	`);
 	cb();
 });

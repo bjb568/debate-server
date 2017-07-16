@@ -139,6 +139,7 @@ h1 a {
 	background: #f8f8f8;
 	white-space: pre-wrap;
 }
+.cut { background: #eef }
 .card > :nth-child(2), p:first-child { margin-top: 0 }
 p:first-child { margin-bottom: 0 }
 .card > :last-child { margin-bottom: 0 }
