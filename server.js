@@ -70,6 +70,7 @@ const readNearest = o(function*(p, prop, cb) {
 const endReadDir = function(indexFile, ret, cb) {
 	ret.sub = ret.sub.sort(nameSort);
 	(indexFile || '').toString().split('\n').forEach((itemName, i) => {
+		if (i >= ret.sub.length) return;
 		const replaceRegex = /^- |\s*\d*$/g;
 		itemName = itemName.replace(replaceRegex, '');
 		let j = -1;
