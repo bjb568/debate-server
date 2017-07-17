@@ -220,7 +220,7 @@ const writeJumps = o(function*(tree, cb) {
 	let r = `<a class="jump${tree.sub ? ' jump-folder' : ''}" data-jump="${path.relative(config.dataPath, tree.p.html())}">${path.basename(tree.p)}</a>`;
 	if (tree.sub) {
 		for (let i = 0; i < tree.sub.length; i++) {
-			r += `<div>${yield writeJumps(tree.sub[i], yield)}</div>`;
+			r += `<div>${path.basename(tree.sub[i].p) == 'intro' ? '' : yield writeJumps(tree.sub[i], yield)}</div>`;
 		}
 	}
 	cb(null, r);
