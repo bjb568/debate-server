@@ -59,7 +59,10 @@ header {
 	font-size: 1.6em;
 	vertical-align: bottom;
 }
-nav { margin-right: 0.5em }
+nav {
+	margin-right: 0.5em;
+	font-size: 0.85em;
+}
 nav > div {
 	max-height: calc(100vh - 4vmin);
 	overflow-y: auto;
