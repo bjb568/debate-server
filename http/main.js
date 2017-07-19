@@ -108,14 +108,15 @@ function smoothScroll(el, t, p, s) {
 		requestAnimationFrame(function(p) {
 			smoothScroll(el, p, t, s);
 		});
-	} else if (dist < -6) {
+	} else if (dist < -6 && document.body.scrollTop) {
 		dist *= -1;
-		if (document.body.scrollTop) {
-			scrollBy(0, -Math.min(dist - 5, Math.max(1, p * dist * elapsed * elapsed / 3000000)));
-			requestAnimationFrame(function(p) {
-				smoothScroll(el, p, t, s);
-			});
-		}
+		scrollBy(0, -Math.min(dist - 5, Math.max(1, p * dist * elapsed * elapsed / 3000000)));
+		requestAnimationFrame(function(p) {
+			smoothScroll(el, p, t, s);
+		});
+	} else {
+		el.classList.add('target');
+		setTimeout(() => el.classList.remove('target'), 1000);
 	}
 }
 addEventListener('DOMContentLoaded', function() {
