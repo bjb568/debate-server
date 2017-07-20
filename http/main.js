@@ -120,6 +120,13 @@ function smoothScroll(el, t, p, s) {
 	}
 }
 addEventListener('DOMContentLoaded', function() {
+	document.getElementById('time').addEventListener('click', function(e) {
+		const now = new Date().getTime();
+		if (mainTimer.lastTap > now - 500) mainTimer.running = mainTimer.time = 0;
+		else mainTimer.running ^= 1;
+		mainTimer.lastTap = mainTimer.lastTime = now;
+		e.preventDefault();
+	});
 	document.getElementsByTagName('textarea').forEach((ta) => {
 		ta.nextElementSibling.textContent = ta.value + '\n';
 		ta.parentNode.style.height = ta.nextElementSibling.offsetHeight + 'px';

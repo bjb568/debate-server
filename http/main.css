@@ -42,9 +42,8 @@ header {
 }
 #time {
 	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
+	top: 0; right: 0; bottom: 0;
+	touch-action: manipulation;
 	padding: 0 1em;
 	background: #fef;
 	font-family: 'Monaco', monospace;
