@@ -145,7 +145,7 @@ const writeFoot = o(function*(res, cb) {
 });
 const writeCard = o(function*(res, p, cb) {
 	let data = yield read(p, 'toString', yield),
-		i = data.indexOf('\n'),
+		i = data.indexOf('\n') + 1,
 		name = '';
 	if (i != -1) {
 		name = data.substr(0, i);
