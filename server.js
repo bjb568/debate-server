@@ -145,14 +145,14 @@ const writeFoot = o(function*(res, cb) {
 });
 const writeCard = o(function*(res, p, cb) {
 	let data = yield read(p, 'toString', yield),
-		i = data.indexOf('\n') + 1,
+		i = data.indexOf('\n'),
 		name = '';
 	if (i != -1) {
-		name = data.substr(0, i);
-		data = data.substr(i);
+		name = data.substr(0, i + 1);
+		data = data.substr(i + 1);
 	}
 	let c = data.indexOf('\n#-\n'),
-		o = c == -1 ? data : data.substr(c + 4),
+		o = c == -1 ? data : data.substr(c + 3),
 		n = c == -1 ? data : data.substr(0, c),
 		d = path.extname(p) == '.nh' ? [{value: n}] : diff.diffWordsWithSpace(o, n, {ignoreCase: true}),
 		r = name.imd();
