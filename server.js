@@ -165,7 +165,7 @@ const writeCard = o(function*(res, p, cb) {
 		<a class="right controls edit-button">Edit</a>
 		<div class="edit" data-path="${path.relative(config.dataPath, p).html()}" hidden="">
 			<div class="ta-cont">
-				<textarea id="ta">${c == -1 ? '' : o.html()}</textarea>
+				<textarea id="ta">${c == -1 ? '' : o.substr(1).html()}</textarea>
 				<pre></pre>
 			</div>
 			<div class="ta-cont">
