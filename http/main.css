@@ -190,6 +190,7 @@ h6 { font-size: 0.7em }
 .edit > div { width: 50% }
 .edit > div:last-child { margin-left: 1em }
 small, .time { color: #666 }
+small a { color: #444 }
 ins { color: #f00 }
 del { opacity: 0.9 }
 body.minimize del { font-size: 0.5em }
