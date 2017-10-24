@@ -46,7 +46,7 @@ const createFileR = o(function*(p, cb) {
 	try {
 		yield fs.stat(path.dirname(p), yield);
 	} catch (e) {
-		yield createDir(path.dirname(p), yield);
+		yield createDirR(path.dirname(p), yield);
 	}
 	try {
 		yield fs.stat(p, yield);
