@@ -3,5 +3,5 @@
 const path = require('path');
 module.exports = {
 	port: 3873,
-	dataPath: path.join(process.env.HOME, '/Dropbox/Debate/17-18/LD/Topic Prep/Human Enhancement/Brian/debate-data')
+	dataPath: path.join(process.env.HOME, '/Dropbox/Debate/17-18/LD/Topic Prep/Compulsory Service/Brian/debate-data')
 };
